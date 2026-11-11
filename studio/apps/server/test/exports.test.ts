@@ -282,7 +282,8 @@ describe("cancelación", () => {
     const ex = join(dir, `${s.pid}.gangstudio`, "exports");
     await new Promise((r) => setTimeout(r, 300));
     expect(await readdir(ex)).toEqual([]); // ni vídeo a medias ni temporales
-    const alive = await new Promise<string>((res) => execFile("pgrep", ["-f", "libx264.*grande"], (e, out) => res(e ? "" : String(out).trim())));
+    // FFmpeg recibe la ruta temporal dentro de la carpeta de exportaciones de ESTE proyecto: si queda algún proceso, aparece aquí
+    const alive = await new Promise<string>((res) => execFile("pgrep", ["-f", ex], (e, out) => res(e ? "" : String(out).trim())));
     expect(alive).toBe(""); // no queda FFmpeg trabajando
   }, 120_000);
 

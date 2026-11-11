@@ -71,13 +71,17 @@ describe("exportar desde la interfaz", () => {
     expect(await bar.getAttribute("role")).toBe("progressbar");
     const values: number[] = [];
     const statuses = new Set<string>();
+    let shot = false;
     for (let i = 0; i < 4000; i++) {
       if (await page.getByTestId("export-done").count()) break;
       const v = await bar.getAttribute("aria-valuenow", { timeout: 500 }).catch(() => null);
       if (v !== null) values.push(Number(v));
       const st = await page.getByTestId("export-status").textContent({ timeout: 500 }).catch(() => null);
       if (st) statuses.add(st);
-      if (values.length === 6) await page.screenshot({ path: join(SHOTS, "21-exportando-escritorio.png") });
+      if (!shot && values.length && values.at(-1)! >= 25) {
+        shot = true;
+        await page.screenshot({ path: join(SHOTS, "21-exportando-escritorio.png") });
+      }
       await page.waitForTimeout(40);
     }
     await waitDone(page);
@@ -101,7 +105,7 @@ describe("exportar desde la interfaz", () => {
     expect(await dialog(page).textContent()).toContain("Exportación cancelada");
     await page.waitForTimeout(400);
     expect(await readdir(exportsOf(s.projectId))).toEqual([]);
-    expect(await pgrepX264("libx264.*grande-cancelar")).toBe("");
+    expect(await pgrepX264(exportsOf(s.projectId))).toBe(""); // ningún FFmpeg sigue con esta carpeta (la ruta temporal está en sus argumentos)
     await ctx.close();
   }, 120_000);
 
@@ -412,6 +416,7 @@ describe("ejemplos reales", () => {
     const run = async (format: string, name: string, extra: () => Promise<void> = async () => undefined) => {
       await openDialog(page);
       await page.getByTestId(`export-format-${format}`).click();
+      if (format !== "png") await page.selectOption("[data-testid=export-fps]", "same"); // la ventana recuerda la última elección
       await extra();
       await page.getByTestId("export-name").fill(name);
       await page.getByTestId("export-start").click();
