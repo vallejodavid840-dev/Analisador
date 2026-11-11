@@ -1,0 +1,13 @@
+{
+  "name": "@gas/studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": { "@gas/core": "*" },
+  "devDependencies": { "vite": "^7.0.0" }
+}

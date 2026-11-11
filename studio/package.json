@@ -1,0 +1,35 @@
+{
+  "name": "gang-anime-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "GANG ANIME STUDIO — estudio de producción de anime 2D (monorepo)",
+  "license": "UNLICENSED",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,studio \"npm run dev -w @gas/server\" \"npm run dev -w @gas/studio\"",
+    "build": "npm run build -w @gas/studio",
+    "start": "npm run build && npm run start -w @gas/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "e2e": "npm run build && vitest run --config vitest.e2e.config.ts",
+    "check": "npm run typecheck && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.14.0",
+    "playwright": "^1.65.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}
