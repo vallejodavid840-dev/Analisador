@@ -72,3 +72,12 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 
 # Regla extra
 - Si el usuario no manda letra de referencia, NO inventar una: pedirla o usar solo la historia. Con referencia: analizar primero y escribir algo original (no copiar frases; adaptar la jerga al mundo de David, no al dialecto de la referencia).
+
+# HISTORIA B (nueva, basada en las portadas): ÁLBUM "Línea 04"
+(La Historia A de David sigue guardada arriba; esta es aparte. Mismo mundo de 4 zonas.)
+- Concepto: una línea de metro, la **Línea 04**, cruza las 4 zonas (Sur, Este, Oeste, Norte). Cada canción es una estación/etapa de la vida. Mezcla tragedia, comedia y ficción. Ciclo vida/muerte: el álbum termina donde empieza.
+- **Rafa "el Porfiado"**: chavito terco del Sur, con una herradura dorada colgada (se la dio su abuelo). Crece: niño → vigía/"ojo" en los techos → dinero (la "graduación") → traición → baja del tren. Al final otro chavito con la herradura sube en el Sur (loop).
+- **El Ojo**: símbolo rojo pintado en los túneles; también la voz del viejo jefe que ve quién sube y quién baja (reglas de la Línea, lealtad, pago, traición).
+- 13 canciones, géneros y voces variados (rap, trap, pop-folk, cumbia, balada rap, etc.), voces/personajes ficticios distintos; una sola voz por canción salvo pedido.
+- Portadas: SIN caras (siluetas, de espaldas, dibujo/gouache/ilustración), nada de personas reales ni texto dentro de la imagen.
+- Pista 1: "El Ojo" (letra hecha con la referencia "somos de calle": coro 3 veces, versos largos de pares).
