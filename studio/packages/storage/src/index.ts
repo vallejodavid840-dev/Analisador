@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile, copyFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  ANIMATION_SCHEMA_VERSION,
   AnimationSchema,
   ID_PATTERN,
   PROJECT_SUBDIRS,
@@ -144,7 +145,8 @@ export function createProjectStore(rootDir: string): ProjectStore {
     return project;
   }
 
-  async function readAnimationFile(file: string): Promise<Animation | null> {
+  /** Lee un dibujo de disco. `fromVersion` es la versión con la que se escribió (para saber si hubo migración). */
+  async function readAnimationFile(file: string): Promise<{ anim: Animation; fromVersion: number } | null> {
     let text: string;
     try {
       text = await readFile(file, "utf8");
@@ -153,7 +155,9 @@ export function createProjectStore(rootDir: string): ProjectStore {
       throw err;
     }
     try {
-      return parseAnimation(JSON.parse(text));
+      const raw: unknown = JSON.parse(text);
+      const fromVersion = typeof raw === "object" && raw !== null ? Number((raw as { schemaVersion?: unknown }).schemaVersion) : NaN;
+      return { anim: parseAnimation(raw), fromVersion };
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err);
       throw new StorageError(`El dibujo del episodio está dañado y no se ha modificado (${detail}). Hay una copia anterior en «.prev».`, "corrupt");
@@ -164,7 +168,7 @@ export function createProjectStore(rootDir: string): ProjectStore {
     async loadAnimation(projectId, episodeId) {
       const project = await assertEpisode(projectId, episodeId);
       const existing = await readAnimationFile(animationFile(projectId, episodeId));
-      if (existing) return existing;
+      if (existing) return existing.anim;
       return createAnimation({ episodeId, fps: project.settings.fps, width: project.settings.width, height: project.settings.height });
     },
 
@@ -177,7 +181,7 @@ export function createProjectStore(rootDir: string): ProjectStore {
       await assertEpisode(projectId, anim.episodeId);
       const file = animationFile(projectId, anim.episodeId);
       const current = await readAnimationFile(file);
-      const currentRevision = current?.revision ?? 0;
+      const currentRevision = current?.anim.revision ?? 0;
       if (anim.revision !== currentRevision) {
         throw new StorageError(
           "El dibujo cambió en el disco desde que lo abriste (¿otro dispositivo?). Recárgalo antes de guardar.",
@@ -185,7 +189,14 @@ export function createProjectStore(rootDir: string): ProjectStore {
         );
       }
       await mkdir(join(dirOf(projectId), "episodes"), { recursive: true });
-      if (current) await copyFile(file, `${file}.prev`);
+      if (current) {
+        await copyFile(file, `${file}.prev`);
+        // Primera vez que se guarda un archivo de una versión anterior: se conserva el original intacto.
+        if (current.fromVersion < ANIMATION_SCHEMA_VERSION) {
+          const backup = `${file}.bak-v${current.fromVersion}`;
+          if (!(await exists(backup))) await copyFile(file, backup);
+        }
+      }
       const revision = currentRevision + 1;
       await writeJsonAtomic(file, { ...anim, revision }, false);
       return { revision };

@@ -4,6 +4,7 @@ import { compositeInk, drawStrokes, paintPieces, type Ctx2D } from "@gas/render"
 import { LayerCache, cacheScaleFor, ctxOf, frameImage, liveInk, liveScratch, opacityScratch } from "./cache";
 import { handlesFor, ROTATE_OFFSET_PX } from "./handles";
 import type { EditorModel } from "./model";
+import { drawRigOverlay } from "./rig-overlay";
 
 export interface View {
   zoom: number;
@@ -38,6 +39,8 @@ export class Viewport {
   private queued = false;
   private live: Live | null = null;
   marquee: Rect | null = null;
+  /** Hueso que se está dibujando (vista previa mientras se arrastra). */
+  rigGhost: { a: [number, number]; b: [number, number] } | null = null;
   onViewChange: () => void = () => undefined;
   /** Para pruebas y diagnóstico: nº de redibujados. */
   renders = 0;
@@ -252,9 +255,8 @@ export class Viewport {
     if (o.enabled && !m.playing) {
       const i0 = m.frameIndex;
       const draw = (offset: number, tint: string, rank: number) => {
-        const f = d.frames[i0 + offset];
-        if (!f) return;
-        const img = frameImage(d, f, { scale: 0.5, tint });
+        if (!d.frames[i0 + offset]) return;
+        const img = frameImage(d, m.renderedFrame(i0 + offset), { scale: 0.5, tint }); // con el rig aplicado, como se verá en la exportación
         ctx.globalAlpha = 0.42 * Math.pow(0.6, rank);
         ctx.drawImage(img, 0, 0, d.width, d.height);
       };
@@ -264,7 +266,7 @@ export class Viewport {
     }
 
     // Capas de abajo a arriba.
-    const frame = m.frame;
+    const frame = m.renderedFrame();
     for (const layer of d.layers) {
       if (!layer.visible) continue;
       const strokes = strokesOf(frame, layer.id);
@@ -313,6 +315,24 @@ export class Viewport {
         ctx.fill();
         ctx.strokeStyle = "#08080c";
         ctx.stroke();
+      }
+    }
+    drawRigOverlay(ctx, m, zoom, touch);
+    if (this.rigGhost) {
+      const g = this.rigGhost;
+      ctx.setLineDash([8 / zoom, 5 / zoom]);
+      ctx.lineWidth = 3 / zoom;
+      ctx.strokeStyle = "#ffc233";
+      ctx.beginPath();
+      ctx.moveTo(g.a[0], g.a[1]);
+      ctx.lineTo(g.b[0], g.b[1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (const p of [g.a, g.b]) {
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 6 / zoom, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffc233";
+        ctx.fill();
       }
     }
     ctx.restore();

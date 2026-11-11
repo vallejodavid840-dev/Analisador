@@ -165,3 +165,51 @@ export async function seedColors(env: Env, o: { colors: string[]; hold?: number;
   if (!r.ok) throw new Error(await r.text());
   return { ...ep, anim };
 }
+
+/* ───────── Rigging ───────── */
+export interface BoneGeo {
+  head: [number, number];
+  tail: [number, number];
+}
+
+/** Geometría (en el lienzo) del hueso por nombre, tal como se muestra ahora (reposo o pose según el modo). */
+export const boneGeo = (page: Page, name: string): Promise<BoneGeo> =>
+  page.evaluate((n) => {
+    const m = window.__gas!.model;
+    const info = m.rigStates()!;
+    const b = info.sk.bones.find((x) => x.name === n);
+    if (!b) throw new Error(`hueso «${n}» no existe: ${info.sk.bones.map((x) => x.name).join(", ")}`);
+    const s = info.states.get(b.id)!;
+    return { head: [...s.head] as [number, number], tail: [...s.tail] as [number, number] };
+  }, name);
+
+/** Giro de pose (grados) de un hueso en el fotograma actual. */
+export const poseRot = (page: Page, name: string): Promise<number> =>
+  page.evaluate((n) => {
+    const info = window.__gas!.model.rigStates()!;
+    const b = info.sk.bones.find((x) => x.name === n)!;
+    return info.pose.get(b.id)!.r;
+  }, name);
+
+/** Arrastra con el ratón entre dos puntos del LIENZO. */
+export async function dragDoc(page: Page, from: [number, number], to: [number, number], steps = 8): Promise<void> {
+  const a = await toScreen(page, ...from);
+  const b = await toScreen(page, ...to);
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(b.x, b.y, { steps });
+  await page.mouse.up();
+  await settle(page);
+}
+
+export const boneRow = (page: Page, name: string) => page.locator("[data-testid=bone-row]", { hasText: name }).first();
+
+/** Escribe en un campo numérico del panel y confirma (evento change). */
+export async function setNum(page: Page, testid: string, value: number): Promise<void> {
+  const el = page.getByTestId(testid);
+  await el.fill(String(value));
+  await el.blur();
+  await settle(page);
+}
+
+export const skeletonOf = (page: Page) => page.evaluate(() => JSON.parse(JSON.stringify(window.__gas!.model.skeleton)));

@@ -5,6 +5,7 @@ import { Transform } from "node:stream";
 import { createCanvas, type Canvas, type SKRSContext2D } from "@napi-rs/canvas";
 import { ZipFile } from "yazl";
 import type { Animation } from "@gas/core";
+import { posedFrame } from "@gas/engine";
 import { composeFrame, type CanvasHandle, type Ctx2D, type ScratchProvider } from "@gas/render";
 import { ExportError, describeFfmpegFailure } from "./errors";
 import { VideoEncoder, buildVideoArgs, ffmpegPaths, probeCapabilities, validateVideo, type FfmpegPaths } from "./ffmpeg";
@@ -92,8 +93,9 @@ class FrameRenderer {
   }
 
   private draw(drawing: number): void {
-    const frame = this.anim.frames[drawing];
-    if (!frame) throw new ExportError("invalid-options", `El fotograma ${drawing + 1} no existe.`);
+    if (!this.anim.frames[drawing]) throw new ExportError("invalid-options", `El fotograma ${drawing + 1} no existe.`);
+    // El rig se aplica con LA MISMA función que usa el editor (lienzo, reproducción, miniaturas): lo exportado es lo que se ve.
+    const frame = posedFrame(this.anim, drawing);
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.globalCompositeOperation = "source-over";
     this.ctx.globalAlpha = 1;

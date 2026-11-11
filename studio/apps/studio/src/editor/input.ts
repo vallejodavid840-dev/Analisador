@@ -1,6 +1,7 @@
 import { hitStroke, rectsIntersect, rotateAbout, scaleAbout, shortId, strokeBounds, translation, type Matrix, type Rect, type Stroke } from "@gas/core";
 import { anchorFor, handlesFor, type HandleId } from "./handles";
 import type { EditorModel } from "./model";
+import { RigPointer } from "./rig-input";
 import type { Viewport } from "./viewport";
 
 type Mode =
@@ -11,6 +12,7 @@ type Mode =
   | { kind: "pan"; id: number; x: number; y: number }
   | { kind: "gesture"; midX: number; midY: number; dist: number }
   | { kind: "xform"; id: number; handle: HandleId | "move"; base: Stroke[]; bounds: Rect; start: [number, number] }
+  | { kind: "rig"; id: number }
   | { kind: "marquee"; id: number; start: [number, number]; startScreen: [number, number]; additive: boolean };
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -21,6 +23,7 @@ export class InputController {
   private mode: Mode = { kind: "none" };
   private readonly cursor: HTMLElement;
   private readonly cleanup: Array<() => void> = [];
+  private readonly rig: RigPointer;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -32,6 +35,7 @@ export class InputController {
     this.cursor.className = "brush-cursor";
     this.cursor.hidden = true;
     canvas.parentElement!.append(this.cursor);
+    this.rig = new RigPointer(model, vp);
     const on = <K extends keyof HTMLElementEventMap>(t: K, fn: (e: HTMLElementEventMap[K]) => void, opts?: AddEventListenerOptions) => {
       canvas.addEventListener(t, fn as EventListener, opts);
       this.cleanup.push(() => canvas.removeEventListener(t, fn as EventListener));
@@ -52,13 +56,14 @@ export class InputController {
 
   /** Hay una operación en curso: no es seguro guardar ni cambiar el documento por otra vía. */
   get busy(): boolean {
-    return this.mode.kind === "draw" || this.mode.kind === "xform" || this.mode.kind === "marquee" || this.mode.kind === "gesture";
+    return this.mode.kind === "draw" || this.mode.kind === "rig" || this.mode.kind === "xform" || this.mode.kind === "marquee" || this.mode.kind === "gesture";
   }
 
   /** Cancela cualquier operación en curso (p. ej. al deshacer o cambiar de herramienta). */
   cancel(): void {
     if (this.mode.kind === "draw") this.vp.cancelLive();
     if (this.mode.kind === "xform") this.model.cancelTransform();
+    if (this.mode.kind === "rig") this.rig.cancel();
     this.vp.marquee = null;
     this.mode = { kind: "none" };
   }
@@ -98,6 +103,10 @@ export class InputController {
     }
     if (tool === "pen" || tool === "eraser") this.startStroke(e);
     else if (tool === "select") this.startSelect(e);
+    else if (tool === "rig") {
+      const w = this.vp.toWorld(e.clientX, e.clientY);
+      if (this.rig.down(w, e.pointerType === "touch")) this.mode = { kind: "rig", id: e.pointerId };
+    }
   }
 
   private move(e: PointerEvent): void {
@@ -130,6 +139,8 @@ export class InputController {
     } else if (m.kind === "draw" && m.id === e.pointerId) {
       const evs = e.getCoalescedEvents?.();
       for (const ce of evs && evs.length ? evs : [e]) this.addPoint(m, ce);
+    } else if (m.kind === "rig" && m.id === e.pointerId) {
+      this.rig.move(this.vp.toWorld(e.clientX, e.clientY));
     } else if (m.kind === "xform" && m.id === e.pointerId) {
       this.dragTransform(m, e);
     } else if (m.kind === "marquee" && m.id === e.pointerId) {
@@ -156,6 +167,8 @@ export class InputController {
     if (m.kind === "draw") {
       if (cancelled) this.vp.cancelLive();
       else this.finishStroke(m);
+    } else if (m.kind === "rig") {
+      this.rig.up(cancelled);
     } else if (m.kind === "xform") {
       if (cancelled) this.model.cancelTransform();
       else this.model.endTransform();

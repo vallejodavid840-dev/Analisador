@@ -12,6 +12,7 @@ import { LayersPanel } from "./layers";
 import { EditorModel, loadPrefs, type Tool } from "./model";
 import { BrushPanel, ColorPanel } from "./panels";
 import { Player } from "./player";
+import { RigPanel } from "./rig-panel";
 import { Timeline } from "./timeline";
 import { iconBtn, setDisabled, setPressed } from "./ui";
 import { Viewport } from "./viewport";
@@ -32,6 +33,7 @@ const TOOLS: Array<{ tool: Tool; icon: IconName }> = [
   { tool: "eraser", icon: "eraser" },
   { tool: "select", icon: "select" },
   { tool: "hand", icon: "hand" },
+  { tool: "rig", icon: "bones" },
 ];
 
 const isTyping = (t: EventTarget | null) => t instanceof HTMLElement && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
@@ -92,6 +94,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
   const brush = new BrushPanel(model);
   const color = new ColorPanel(model);
   const layers = new LayersPanel(model);
+  const rigPanel = new RigPanel(model);
   const autosave = new AutoSave(opts.projectId, model, serverRevision, () => input.busy);
 
   let toastTimer = 0;
@@ -111,19 +114,20 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
     toolbar.append(b);
   }
   // Paneles: en pantallas pequeñas se abren como hoja inferior.
-  let sheet: "brush" | "color" | "layers" | null = null;
+  let sheet: "brush" | "color" | "layers" | "rig" | null = null;
   const sheetBtns = {
     brush: iconBtn("brush", T.brushTitle, () => toggleSheet("brush"), { testid: "open-brush", cls: "tool sheet-btn", text: "Ajustes" }),
     color: iconBtn("palette", T.colorTitle, () => toggleSheet("color"), { testid: "open-color", cls: "tool sheet-btn", text: T.colorTitle }),
     layers: iconBtn("layers", T.layersTitle, () => toggleSheet("layers"), { testid: "open-layers", cls: "tool sheet-btn", text: T.layersTitle }),
+    rig: iconBtn("bones", es.rig.title, () => toggleSheet("rig"), { testid: "open-rig", cls: "tool sheet-btn", text: "Huesos" }),
   };
   const colorDot = h("span", { class: "color-dot" });
   sheetBtns.color.append(colorDot);
-  toolbar.append(sheetBtns.brush, sheetBtns.color, sheetBtns.layers);
+  toolbar.append(sheetBtns.brush, sheetBtns.color, sheetBtns.layers, sheetBtns.rig);
 
   const side = h("aside", { class: "side", "data-testid": "side" },
     h("button", { type: "button", class: "ibtn sheet-close", "aria-label": T.sheetClose, title: T.sheetClose, onclick: () => toggleSheet(null) }, icon("close", 20)),
-    brush.el, color.el, layers.el);
+    brush.el, color.el, layers.el, rigPanel.el);
   function toggleSheet(s: typeof sheet): void {
     sheet = sheet === s ? null : s;
     side.dataset["open"] = sheet ?? "";
@@ -181,6 +185,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
     zoomPct.textContent = T.zoomPct(viewport.view.zoom);
     colorDot.style.background = model.prefs.color;
     stage.dataset["tool"] = model.prefs.tool;
+    side.dataset["tool"] = model.prefs.tool;
     stage.dataset["playing"] = String(model.playing);
     const n = model.selection.size;
     selBar.hidden = !(model.prefs.tool === "select" && n > 0);
@@ -190,6 +195,12 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
         iconBtn("flip", T.selFlip, () => model.flipSelection(), { testid: "sel-flip", text: "Voltear" }),
         iconBtn("dup", T.selDup, () => model.duplicateSelection(), { testid: "sel-dup", text: "Duplicar" }),
         iconBtn("trash", T.selDel, () => model.deleteSelection(), { testid: "sel-del", text: "Eliminar" }),
+        (() => {
+          // Separar las partes de un personaje: enviar la selección a otra capa (para vincular cada capa a su hueso)
+          const sel = h("select", { class: "sel-move", "data-testid": "sel-move-layer", "aria-label": es.rig.moveTo }, h("option", { value: "" }, es.rig.moveTo), ...model.doc.layers.filter((l) => l.id !== model.layerId).map((l) => h("option", { value: l.id }, l.name)));
+          sel.addEventListener("change", () => sel.value && model.moveSelectionToLayer(sel.value));
+          return sel;
+        })(),
       );
     }
   }
@@ -199,6 +210,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
     if (c.doc || c.ui) {
       timeline.update(c);
       layers.update();
+      rigPanel.update();
       brush.update();
       color.update();
       refreshUi();
@@ -225,6 +237,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
       case "e": input.cancel(); model.setTool("eraser"); break;
       case "v": input.cancel(); model.setTool("select"); break;
       case "h": input.cancel(); model.setTool("hand"); break;
+      case "k": input.cancel(); model.setTool("rig"); break;
       case " ": case "enter": e.preventDefault(); if (!(document.activeElement instanceof HTMLButtonElement)) player.toggle(); break;
       case "arrowleft": e.preventDefault(); player.pause(); model.setFrameIndex(model.frameIndex - 1); break;
       case "arrowright": e.preventDefault(); player.pause(); model.setFrameIndex(model.frameIndex + 1); break;

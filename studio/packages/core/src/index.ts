@@ -4,3 +4,4 @@ export * from "./migrate";
 export * from "./animation";
 export * from "./geometry";
 export * from "./exports";
+export * from "./rig";

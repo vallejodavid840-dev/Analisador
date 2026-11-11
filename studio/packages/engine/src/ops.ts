@@ -7,6 +7,7 @@ import {
   type Animation,
   type Frame,
   type Layer,
+  type Skeleton,
   type Stroke,
 } from "@gas/core";
 
@@ -49,6 +50,12 @@ export function assertEditable(a: Animation, layerId: string): Layer {
   return layer;
 }
 
+/** Al eliminar una capa se quitan sus vínculos con esqueletos (si los tenía); si no, devuelve el mismo array. */
+function dropLayerBindings(rigs: Skeleton[] | undefined, layerId: string): Skeleton[] | undefined {
+  if (!rigs?.some((s) => s.bindings.some((b) => b.layerId === layerId))) return rigs;
+  return rigs.map((s) => (s.bindings.some((b) => b.layerId === layerId) ? { ...s, bindings: s.bindings.filter((b) => b.layerId !== layerId) } : s));
+}
+
 /* ─────────── Capas ─────────── */
 
 export function addLayer(a: Animation, name?: string, aboveLayerId?: string): { doc: Animation; layerId: string } {
@@ -65,6 +72,7 @@ export function removeLayer(a: Animation, layerId: string): Animation {
   return {
     ...a,
     layers: a.layers.filter((l) => l.id !== layerId),
+    ...(a.rigs ? { rigs: dropLayerBindings(a.rigs, layerId) } : {}),
     frames: a.frames.map((f) => {
       if (!(layerId in f.cells)) return f;
       const cells = { ...f.cells };
@@ -111,7 +119,7 @@ export function duplicateFrame(a: Animation, index: number): { doc: Animation; f
   if (a.frames.length >= MAX_FRAMES) throw new EngineError(`Máximo ${MAX_FRAMES} fotogramas`, "limit");
   const src = a.frames[index];
   if (!src) throw new EngineError("Fotograma inexistente", "not-found");
-  const copy: Frame = { id: longId(), hold: src.hold, cells: { ...src.cells } };
+  const copy: Frame = { id: longId(), hold: src.hold, cells: { ...src.cells }, ...(src.poses ? { poses: src.poses } : {}) };
   return { doc: { ...a, frames: [...a.frames.slice(0, index + 1), copy, ...a.frames.slice(index + 1)] }, frameId: copy.id };
 }
 

@@ -7,6 +7,7 @@ import { iconBtn, setDisabled, setPressed, stepper } from "./ui";
 import type { Change, EditorModel } from "./model";
 import type { Player } from "./player";
 import { FPS_PRESETS, MAX_HOLD } from "@gas/core";
+import { keyIndices, posedFrame } from "@gas/engine";
 
 const T = es.editor;
 const THUMB_W = 88;
@@ -28,6 +29,8 @@ export class Timeline {
   private pending = new Set<string>();
   private pumpTimer = 0;
   private lastActive = "";
+  /** Identidades de rigs y keyframes en la última actualización: si cambian, las miniaturas con pose se repintan. */
+  private rigRefs: readonly unknown[] = [];
   private readonly refs: Record<string, HTMLElement> = {};
   private onionSteppers: Array<{ el: HTMLElement; refresh: () => void }> = [];
   private holdStepper!: { el: HTMLElement; refresh: () => void };
@@ -118,7 +121,9 @@ export class Timeline {
   private paintThumb(c: Cell): void {
     const doc = this.model.doc;
     const f = c.frame!;
-    const img = frameImage(doc, f, { scale: (THUMB_W * 2) / doc.width, background: "#ffffff", layerSource: this.peek });
+    // Con rig, la miniatura muestra la POSE de ese fotograma (la animación), no el dibujo de reposo.
+    const posed = doc.rigs?.length ? posedFrame(doc, Math.max(0, doc.frames.findIndex((x) => x.id === f.id))) : f;
+    const img = frameImage(doc, posed, { scale: (THUMB_W * 2) / doc.width, background: "#ffffff", layerSource: this.peek });
     const ctx = c.canvas.getContext("2d")!;
     ctx.clearRect(0, 0, c.canvas.width, c.canvas.height);
     ctx.drawImage(img, 0, 0, c.canvas.width, c.canvas.height);
@@ -129,6 +134,11 @@ export class Timeline {
     const m = this.model;
     const doc = m.doc;
     const R = this.refs;
+
+    // ¿Cambió algo del rig (esqueleto, vínculos o cualquier keyframe)? Entonces TODAS las miniaturas pueden cambiar (interpolación).
+    const refs: unknown[] = [doc.rigs, ...(doc.rigs?.length ? doc.frames.map((fr) => fr.poses) : [])];
+    const rigChanged = refs.length !== this.rigRefs.length || refs.some((r, i) => r !== this.rigRefs[i]);
+    this.rigRefs = refs;
 
     // Celdas (reconciliación por id: no se reconstruye lo que no cambió).
     const seen = new Set<string>();
@@ -152,10 +162,16 @@ export class Timeline {
         this.pending.add(f.id);
         this.pump(wasNew || f.id !== m.frameId ? 0 : 140);
       }
+      if (rigChanged && c.frame === f) {
+        this.pending.add(f.id);
+        this.pump(f.id === m.frameId ? 140 : 40);
+      }
       const active = f.id === m.frameId;
+      const hasKey = !!m.skeleton && keyIndices(doc.frames, m.skeleton.id).includes(i);
+      c.btn.classList.toggle("keyed", hasKey);
       c.btn.classList.toggle("active", active);
       c.btn.setAttribute("aria-selected", String(active));
-      c.btn.setAttribute("aria-label", T.frameCell(i + 1, f.hold));
+      c.btn.setAttribute("aria-label", T.frameCell(i + 1, f.hold) + (hasKey ? ", con keyframe de pose" : ""));
       c.btn.dataset["index"] = String(i);
       c.btn.style.width = `${THUMB_W + 16 + Math.min(f.hold - 1, 6) * 14}px`;
       c.num.textContent = String(i + 1);

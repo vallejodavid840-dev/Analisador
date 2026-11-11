@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { IdSchema, FpsSchema } from "./schema";
 import { migrate, ProjectFormatError, type Migration } from "./migrate";
+import { MAX_SKELETONS, PoseKeySchema, SkeletonSchema } from "./rig";
 
 /** Versión del formato de `episodes/<id>.json`. Independiente de la del proyecto. */
-export const ANIMATION_SCHEMA_VERSION = 1;
+export const ANIMATION_SCHEMA_VERSION = 2;
 
 export const MAX_LAYERS = 64;
 export const MAX_FRAMES = 2000;
@@ -44,6 +45,8 @@ export const FrameSchema = z.object({
   hold: z.number().int().min(1).max(MAX_HOLD),
   /** Trazos por capa (clave = id de capa). Orden del array = orden de dibujo. */
   cells: z.record(IdSchema, z.array(StrokeSchema)),
+  /** Keyframes de pose por esqueleto (Fase 3). Un fotograma sin entrada se interpola entre sus keys vecinos. */
+  poses: z.record(IdSchema, PoseKeySchema).optional(),
 });
 
 export const AnimationSchema = z.object({
@@ -57,6 +60,8 @@ export const AnimationSchema = z.object({
   /** De abajo (índice 0) a arriba. */
   layers: z.array(LayerSchema).min(1).max(MAX_LAYERS),
   frames: z.array(FrameSchema).min(1).max(MAX_FRAMES),
+  /** Esqueletos y vínculos (Fase 3). Ausente en animaciones anteriores: se leen igual, sin rig. */
+  rigs: z.array(SkeletonSchema).max(MAX_SKELETONS).optional(),
 });
 
 export type Stroke = z.infer<typeof StrokeSchema>;
@@ -98,7 +103,12 @@ export function createAnimation(input: NewAnimation): Animation {
   });
 }
 
-export const ANIMATION_MIGRATIONS: readonly Migration[] = [];
+/**
+ * v1 → v2 (Fase 3): se añaden `rigs` y `frames[].poses`, ambos OPCIONALES, así que un documento v1 es ya un v2
+ * válido; la migración solo sube la versión. (Una aplicación anterior rechazará un v2 con «versión más nueva»
+ * en vez de descartar el rig en silencio al guardar.)
+ */
+export const ANIMATION_MIGRATIONS: readonly Migration[] = [{ from: 1, to: 2, up: (raw) => raw }];
 
 export function parseAnimation(raw: unknown): Animation {
   const { data } = migrate(raw, ANIMATION_MIGRATIONS, ANIMATION_SCHEMA_VERSION);

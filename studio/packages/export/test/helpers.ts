@@ -95,3 +95,32 @@ export function readStoredZip(buf: Buffer): Array<{ name: string; data: Buffer }
   }
   return out;
 }
+
+/** Decodifica todos los fotogramas de un vídeo a RGBA completo (para medir dónde está cada cosa). */
+export function decodeFrames(file: string, w: number, h: number): Promise<Buffer[]> {
+  return new Promise((resolve, reject) => {
+    const p = spawn(ffmpegPaths().ffmpeg, ["-v", "error", "-i", file, "-f", "rawvideo", "-pix_fmt", "rgba", "-"]);
+    const chunks: Buffer[] = [];
+    let err = "";
+    p.stdout.on("data", (d: Buffer) => chunks.push(d));
+    p.stderr.on("data", (d: Buffer) => (err += d));
+    p.on("close", (code) => {
+      if (code !== 0) return reject(new Error(`ffmpeg ${code}: ${err}`));
+      const b = Buffer.concat(chunks);
+      const size = w * h * 4;
+      const out: Buffer[] = [];
+      for (let i = 0; i + size <= b.length; i += size) out.push(b.subarray(i, i + size));
+      resolve(out);
+    });
+  });
+}
+
+/** Centro de masa de los píxeles «rojo vivo» de un fotograma RGBA. */
+export function redCentroid(frame: Buffer, w: number, h: number): [number, number] | null {
+  let sx = 0, sy = 0, n = 0;
+  for (let i = 0; i < w * h; i++) {
+    const r = frame[i * 4]!, g = frame[i * 4 + 1]!, b = frame[i * 4 + 2]!;
+    if (r > 170 && g < 90 && b < 90) { sx += i % w; sy += Math.floor(i / w); n++; }
+  }
+  return n ? [sx / n, sy / n] : null;
+}
