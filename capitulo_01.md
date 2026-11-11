@@ -3,6 +3,7 @@
 
 **Mundo:** República de Costamar · capital Puerto Brisa · barrio de origen: **La Plaza Vieja**
 **Sello:** R.T Records
+**Regla:** David canta TODAS las canciones. Los demás les da pena y solo hacen coros o acompañan.
 **Grupo:** David, Denis, Alex, Jairo, Sebastián y Leyton (primo de David)
 **Hilo conductor:** José, documentalista. Entrevista a todos para saber quién mató a David.
 
@@ -97,7 +98,7 @@
 
 ## CANCIÓN #999 · "Frecuencia 88"
 **Tipo:** sencillo / freestyle en radio (sin álbum)
-**Canta:** Leyton y Jairo (a dos voces); David hace de anfitrión
+**Canta:** David (solo). Leyton y Jairo le dan ánimo desde la cabina
 **Edad de David:** 18 años
 
 *(SFX: pasos rápidos, una escalera metálica, una puerta pesada.)*
@@ -122,13 +123,13 @@
 
 **DAVID (18):** *(susurrando a los otros)* Hermano, no me salen las palabras.
 
-**LEYTON:** *(susurrando)* Primo, tú tranquilo. Nosotros arrancamos y tú te metes cuando sientas.
+**LEYTON:** *(susurrando)* Primo, tú tranquilo. Nosotros no cantamos, nos da pena. Tú eres la voz.
 
 **JAIRO:** *(susurrando)* Ya estamos en el aire. No hay vuelta atrás.
 
 **DON AURELIO:** *(en radio)* Y aquí están. Ya están en el aire.
 
-**[SUENA CANCIÓN: "Estamos al aire" (original, completa, sin editar) · Nombre en nuestro mundo: "Frecuencia 88" · Canta: LEYTON y JAIRO, alternándose; DAVID entra con coros y ad-libs]**
+**[SUENA CANCIÓN: "Estamos al aire" (original, completa, sin editar) · Nombre en nuestro mundo: "Frecuencia 88" · Canta: DAVID, solo. Leyton y Jairo no cantan: les da vergüenza y se quedan en cabina]**
 
 *(Termina la canción. Se escucha el teléfono de la radio sonando sin parar.)*
 
@@ -152,7 +153,7 @@
 
 ## CANCIÓN #998 · "Examen de Cabina"
 **Tipo:** sencillo de batalla (sin álbum, subido a internet)
-**Canta:** Alex (solo)
+**Canta:** David (solo)
 **Edad de David:** 18 años
 
 *(SFX: lugar con eco, gente murmurando, un micrófono que hace "tock, tock".)*
@@ -179,7 +180,7 @@
 
 **ALEX (voz en retrospectiva):** Yo tenía una hoja en el bolsillo y no la saqué. Todo lo que había leído en mis noches de insomnio salió solo.
 
-**[SUENA CANCIÓN: "Ensayo" – Lil Supa (original, completa, sin editar) · Nombre en nuestro mundo: "Examen de Cabina" · Canta: ALEX, solo]**
+**[SUENA CANCIÓN: "Ensayo" – Lil Supa (original, completa, sin editar) · Nombre en nuestro mundo: "Examen de Cabina" · Canta: DAVID, solo]**
 
 *(Termina la canción. Silencio unos tres segundos. Después, aplausos lentos. Alguien silba.)*
 
@@ -197,7 +198,7 @@
 
 ## CANCIÓN #997 · "Fiesta de Costa"
 **Tipo:** sencillo de verano (primer éxito regional)
-**Canta:** Sebastián (solo), con coros de todo el grupo y el público
+**Canta:** David (solo). Sebastián lo empuja al escenario; el público hace los coros
 **Edad de David:** 19 años
 
 *(SFX: playa. Olas. Tambores lejanos. Gente riendo. Una botella que se destapa.)*
@@ -216,15 +217,15 @@
 
 *(SFX: apenas aplausos. Alguien tose.)*
 
-**DAVID (19):** *(a Sebastián, bajito)* Hermano, te toca. Tú sí sabes mover la gente.
+**SEBASTIÁN:** *(empujándolo)* Hermano, te toca. Tú eres el que canta. Nosotros te cubrimos.
 
-**SEBASTIÁN (en entrevista, riendo):** Y yo agarré el micrófono, miré a esas dos mil personas, y les dije: "¿Quién tiene ganas de bailar?". Y solo levantó la mano un señor.
+**SEBASTIÁN (en entrevista, riendo):** Yo lo empujé al micrófono. David miró a esas dos mil personas y preguntó: "¿Quién tiene ganas de bailar?". Y solo levantó la mano un señor.
 
 *(SFX: risas.)*
 
-**SEBASTIÁN (en entrevista):** Pero ese señor era el mejor bailarín del festival. Y dije: "Con uno es suficiente".
+**SEBASTIÁN (en entrevista):** Pero ese señor era el mejor bailarín del festival. Y David dijo: "Con uno es suficiente".
 
-**[SUENA CANCIÓN: "Bomba para afincar" – Vico C (original, completa, sin editar) · Nombre en nuestro mundo: "Fiesta de Costa" · Canta: SEBASTIÁN, solo, con coros de DAVID, DENIS, ALEX, JAIRO, LEYTON y el público]**
+**[SUENA CANCIÓN: "Bomba para afincar" – Vico C (original, completa, sin editar) · Nombre en nuestro mundo: "Fiesta de Costa" · Canta: DAVID, solo, con coros del público]**
 
 *(Termina la canción. Ovación gigante, gritos, silbidos.)*
 
@@ -236,7 +237,7 @@
 
 ## CANCIÓN #996 · "Sangre de Barrio"
 **Tipo:** última pista de la mixtape *Plaza Vieja Vol. 1*. Es la canción del **pacto**.
-**Canta:** Denis (voz principal), con coros de todo el grupo
+**Canta:** David (solo). El grupo solo hace coros suaves
 **Edad de David:** 19 años
 
 *(SFX: pequeña habitación de ensayo. Una lámpara que parpadea. Seis sillas en círculo.)*
@@ -259,11 +260,11 @@
 
 *(SFX: seis vasos que se chocan.)*
 
-**DENIS:** Esa noche escribimos juntos la letra. Yo canté la voz principal. Todos hicimos los coros. David la grabó con los ojos cerrados.
+**DENIS:** Esa noche escribimos juntos la letra. Ninguno de nosotros se animó a cantarla, solo David. Los demás hicimos los coros bajito. Él la grabó con los ojos cerrados.
 
-**DAVID (19):** *(en grabación vieja, voz firme)* Esto va por nosotros. Por los seis. Por los que se fueron y por los que van a venir. Dale, Denis.
+**DAVID (19):** *(en grabación vieja, voz firme)* Esto va por nosotros. Por los seis. Por los que se fueron y por los que van a venir. Yo la canto, ustedes me cubren.
 
-**[SUENA CANCIÓN: "Somos de Calle" – Daddy Yankee (original, completa, sin editar) · Nombre en nuestro mundo: "Sangre de Barrio" · Canta: DENIS (voz principal), coros de DAVID, ALEX, JAIRO, SEBASTIÁN y LEYTON]**
+**[SUENA CANCIÓN: "Somos de Calle" – Daddy Yankee (original, completa, sin editar) · Nombre en nuestro mundo: "Sangre de Barrio" · Canta: DAVID, solo; coros suaves del grupo]**
 
 *(Termina la canción. Silencio largo. Un reloj de pared marca segundos.)*
 
