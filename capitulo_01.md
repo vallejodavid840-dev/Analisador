@@ -3,6 +3,7 @@
 
 **Mundo:** República de Costamar · capital Puerto Brisa · barrio de origen: **La Plaza Vieja**
 **Sello:** R.T Records
+**Regla de formato:** los recuerdos se viven en FLASHBACK: el entrevistado arranca, la escena cambia y los personajes hablan en el momento, con su edad de entonces.
 **Regla:** David canta TODAS las canciones. Los demás les da pena y solo hacen coros o acompañan.
 **Grupo:** David, Denis, Alex, Jairo, Sebastián y Leyton (primo de David)
 **Hilo conductor:** José, documentalista. Entrevista a todos para saber quién mató a David.
@@ -99,6 +100,7 @@
 ## CANCIÓN #999 · "Frecuencia 88"
 **Tipo:** sencillo / freestyle en radio (sin álbum)
 **Canta:** David (solo). Leyton y Jairo le dan ánimo desde la cabina
+**Formato:** entrevista + FLASHBACK en vivo
 **Edad de David:** 18 años
 
 *(SFX: pasos rápidos, una escalera metálica, una puerta pesada.)*
@@ -154,9 +156,7 @@
 ## CANCIÓN #998 · "Examen de Cabina"
 **Tipo:** sencillo de batalla (sin álbum, subido a internet)
 **Canta:** David (solo)
-**Edad de David:** 18 años
-
-*(SFX: lugar con eco, gente murmurando, un micrófono que hace "tock, tock".)*
+**Edad de David:** 18 años · **Formato:** entrevista + FLASHBACK en vivo
 
 **JOSÉ (narrando):** Alex es el más serio del grupo. Habla despacio, escoge cada palabra como quien escoge un cuchillo.
 
@@ -164,33 +164,33 @@
 
 **JOSÉ:** Cuénteme del día de la batalla.
 
-**ALEX:** Un rival, un grupo del otro lado de la ciudad. Los Faroles. Se creían dueños de cada micrófono de Puerto Brisa. Nos retaron en una cabina chica, con público y con cámaras. Y ese día David no pudo ir. Se enfermó o se hizo el enfermo, no sé.
+**ALEX:** Un rival, un grupo del otro lado de la ciudad. Los Faroles. Se creían dueños de cada micrófono de Puerto Brisa. Nos retaron en una cabina chica, con público y con cámaras. Se suponía que yo respondía primero. Pero me quedé mudo. Yo no canto, nunca me animé.
 
-*(SFX: ambiente de batalla, voces del público.)*
+*(FLASHBACK: ambiente de batalla, gente murmurando, micrófono que hace "tock, tock".)*
 
-**LÍDER DE LOS FAROLES:** *(burlón)* ¿Y los otros? ¿Dónde está el calladito? ¿Se asustó?
+**LÍDER DE LOS FAROLES:** *(burlón)* ¿Y este? ¿El calladito? ¿Se asustó?
 
-**ALEX:** *(tranquilo)* Está en otro lado. Yo voy primero.
+**ALEX (joven, nervioso):** Yo... yo no... no me sale.
 
-**LÍDER DE LOS FAROLES:** ¿Tú? ¿El que habla poquito?
+**DAVID (18):** *(tranquilo, seguro)* Yo voy primero.
 
-**ALEX:** Sí. El que piensa antes de hablar.
+**LÍDER DE LOS FAROLES:** *(burlón)* ¿Tú? ¿El que habla poquito?
 
-*(SFX: micrófono. Silencio absoluto. Alex respira.)*
-
-**ALEX (voz en retrospectiva):** Yo tenía una hoja en el bolsillo y no la saqué. Todo lo que había leído en mis noches de insomnio salió solo.
+**DAVID (18):** Sí. El que piensa antes de hablar.
 
 **[SUENA CANCIÓN: "Ensayo" – Lil Supa (original, completa, sin editar) · Nombre en nuestro mundo: "Examen de Cabina" · Canta: DAVID, solo]**
 
-*(Termina la canción. Silencio unos tres segundos. Después, aplausos lentos. Alguien silba.)*
+*(Aplausos lentos. Alguien silba.)*
 
-**LÍDER DE LOS FAROLES:** *(a media voz)* Eso... eso no era lo que esperaba.
+**LÍDER DE LOS FAROLES:** *(sorprendido, a media voz)* Eso... eso no era lo que esperaba.
 
-**ALEX (en entrevista):** Ese día no gané una batalla. Gané respeto. Pero también perdí algo.
+*(Volvemos a la entrevista.)*
 
-**JOSÉ:** ¿Qué perdió?
+**ALEX:** David tenía una hoja en el bolsillo y no la sacó. Todo lo que había leído en sus noches de insomnio salió solo. Ese día no ganamos una batalla. Ganamos respeto. Pero también perdimos algo.
 
-**ALEX:** Perdí la tranquilidad. Porque desde ese día alguien, y no sé quién, empezó a dejarnos mensajes. Cartas. Notas. Siempre con la misma firma: **"El Segundo Admirador"**.
+**JOSÉ:** ¿Qué perdieron?
+
+**ALEX:** La tranquilidad. Porque desde ese día alguien, y no sé quién, empezó a dejarnos mensajes. Cartas. Notas. Siempre con la misma firma: **"El Segundo Admirador"**.
 
 *(SFX: papel que se arruga. Corte.)*
 
