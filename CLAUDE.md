@@ -27,3 +27,21 @@ Revisar yo mismo la letra analizando palabra por palabra, historia, estructura, 
 - Usar lenguaje real de calle/cotidiano, detalles concretos (lugares, objetos, nombres, situaciones específicas), imperfecciones naturales, muletillas, giros de habla humanos.
 - Que cada línea tenga sentido, continuidad de historia y emoción real.
 - Mostrar al usuario solo la versión final ya limpia.
+
+# Historia / universo de las canciones (canon, mantener siempre coherente)
+
+Todas las canciones se basan en una historia que yo voy construyendo mentalmente. Si el usuario no tiene idea, yo propongo ideas y él aprueba o rechaza. Estilo realista, crudo, nada de fantasía.
+
+## El mundo
+- Existen 4 zonas: **Sur, Este, Oeste y Norte**.
+- Mundo realista tipo calle: narcos, drogas, violencia, lealtad, supervivencia. Todo normal para ellos.
+
+## David (protagonista)
+- Nació en el **Sur**. Chico callado, no se lleva con casi nadie, reservado.
+- Vive con sus papás y sus hermanos: es el **mayor**; tiene 1 hermana mediana y 1 hermano pequeño.
+
+## Los 5 amigos (todos del Sur, se llevan bien con David)
+- Denis, Alex, Sebastián, Jairo y otro Alex (pendiente: confirmar si el segundo es otro Alex o un nombre distinto, y qué apodo/rol tiene cada uno).
+
+## Pendiente
+- Primera canción: el usuario la dirá.
