@@ -1,16 +1,17 @@
+import type { Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { AnimationSchema } from "@gas/core";
-import { boneGeo, boneRow, createEpisode, docPixel, dragDoc, isRed, isWhite, line, mouseStroke, openEditorPage, poseRot, settle, setColor, setNum, skeletonOf, startEnv, strokes, toScreen, waitSaved, type Env } from "./helpers";
+import { boneGeo, boneRow, createEpisode, docPixel, dragDoc, isRed, isWhite, line, mouseStroke, openEditorPage, poseRot, settle, setColor, setNum, skeletonOf, startEnv, strokes, type Env } from "./helpers";
 
 let env: Env;
 beforeAll(async () => (env = await startEnv()));
 afterAll(() => env.close());
 
-const bones = (page: import("playwright").Page) => skeletonOf(page).then((s) => s.bones as Array<{ id: string; name: string; parent: string | null; length: number; angle: number; min: number; max: number }>);
-const names = async (page: import("playwright").Page) => (await bones(page)).map((b) => b.name);
+const bones = (page: Page) => skeletonOf(page).then((s) => s.bones as Array<{ id: string; name: string; parent: string | null; length: number; angle: number; min: number; max: number }>);
+const names = async (page: Page) => (await bones(page)).map((b) => b.name);
 
 /** Crea un esqueleto de 3 huesos encadenados dibujándolos con el ratón (modo «Dibujar hueso»). */
-async function chainOf3(page: import("playwright").Page) {
+async function chainOf3(page: Page) {
   await page.getByTestId("tool-rig").click();
   await page.getByTestId("rig-new").click(); // esqueleto vacío, modo editar y «dibujar hueso» activo
   await dragDoc(page, [300, 560], [300, 420]); // raíz
@@ -144,7 +145,7 @@ describe("esqueleto: crear y editar", () => {
 
 describe("vincular capas y deformar el dibujo", () => {
   /** Brazo de 2 huesos (hombro→codo→muñeca) + un trazo ROJO grueso dibujado a lo largo (un solo trazo recto). */
-  async function armSetup(page: import("playwright").Page, mode: "rigid" | "skin") {
+  async function armSetup(page: Page, mode: "rigid" | "skin") {
     await page.getByTestId("brush-size").fill("40");
     await setColor(page, "#ff0000");
     await mouseStroke(page, line(300, 300, 600, 300, 2)); // UN trazo, tres puntos: hombro, medio, muñeca
