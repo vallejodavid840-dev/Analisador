@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import Fastify, { type FastifyInstance } from "fastify";
 import fastifyStatic from "@fastify/static";
 import { z } from "zod";
-import { NewProjectSchema, ProjectSchema } from "@gas/core";
+import { AnimationSchema, NewProjectSchema, ProjectSchema } from "@gas/core";
 import { StorageError, createProjectStore, type StorageErrorCode } from "@gas/storage";
 
 export interface AppOptions {
@@ -56,6 +56,22 @@ export async function buildApp(opts: AppOptions): Promise<FastifyInstance> {
     }
     return store.save(project);
   });
+
+  const ANIMATION_BODY_LIMIT = 64 * 1024 * 1024;
+  app.get<{ Params: { id: string; eid: string } }>("/api/projects/:id/episodes/:eid/animation", async (req) =>
+    store.loadAnimation(req.params.id, req.params.eid),
+  );
+  app.put<{ Params: { id: string; eid: string } }>(
+    "/api/projects/:id/episodes/:eid/animation",
+    { bodyLimit: ANIMATION_BODY_LIMIT },
+    async (req) => {
+      const animation = AnimationSchema.parse(req.body);
+      if (animation.episodeId !== req.params.eid) {
+        throw new StorageError("El episodio del cuerpo no coincide con la URL", "invalid");
+      }
+      return store.saveAnimation(req.params.id, animation);
+    },
+  );
 
   if (opts.staticDir && existsSync(opts.staticDir)) {
     await app.register(fastifyStatic, { root: opts.staticDir });

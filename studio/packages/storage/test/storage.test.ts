@@ -95,3 +95,78 @@ describe("almacenamiento de proyectos", () => {
     expect(await readFile(file, "utf8")).toBe(future);
   });
 });
+
+describe("animaciones por episodio", () => {
+  const stroke = { id: "s1", kind: "pen" as const, color: "#ff0000", size: 5, opacity: 1, sens: 0, points: [1, 2, 1, 3, 4, 1] };
+  async function withEpisode() {
+    let p = await store.create({ name: "S", settings: { fps: 12, width: 640, height: 360 } });
+    p = addSeason(p);
+    p = addEpisode(p, p.seasons[0]!.id);
+    p = await store.save(p);
+    return { p, eid: p.seasons[0]!.episodes[0]!.id };
+  }
+
+  it("un episodio sin dibujo devuelve uno vacío con los ajustes del proyecto, sin escribir nada", async () => {
+    const { p, eid } = await withEpisode();
+    const a = await store.loadAnimation(p.id, eid);
+    expect(a).toMatchObject({ episodeId: eid, revision: 0, fps: 12, width: 640, height: 360 });
+    expect(await readdir(join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "episodes"))).toEqual([]);
+  });
+
+  it("guardar y recargar conserva trazos, capas y fotogramas; la revisión sube", async () => {
+    const { p, eid } = await withEpisode();
+    const a = await store.loadAnimation(p.id, eid);
+    const doc = { ...a, frames: [{ ...a.frames[0]!, hold: 2, cells: { [a.layers[1]!.id]: [stroke] } }], layers: a.layers.map((l, i) => (i === 0 ? { ...l, visible: false, name: "Fondo" } : l)) };
+    expect(await store.saveAnimation(p.id, doc)).toEqual({ revision: 1 });
+    const back = await store.loadAnimation(p.id, eid);
+    expect(back).toEqual({ ...doc, revision: 1 });
+    expect(await store.saveAnimation(p.id, back)).toEqual({ revision: 2 });
+  });
+
+  it("conflicto si la revisión no coincide", async () => {
+    const { p, eid } = await withEpisode();
+    const a = await store.loadAnimation(p.id, eid);
+    await store.saveAnimation(p.id, a);
+    await expect(store.saveAnimation(p.id, a)).rejects.toMatchObject({ code: "conflict" });
+  });
+
+  it("conserva la versión anterior en .prev", async () => {
+    const { p, eid } = await withEpisode();
+    const a = await store.loadAnimation(p.id, eid);
+    await store.saveAnimation(p.id, a); // rev 1
+    const withStroke = { ...a, revision: 1, frames: [{ ...a.frames[0]!, cells: { [a.layers[0]!.id]: [stroke] } }] };
+    await store.saveAnimation(p.id, withStroke); // rev 2, .prev = rev 1 (vacío)
+    const prev = JSON.parse(await readFile(join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "episodes", `${eid}.json.prev`), "utf8"));
+    expect(prev.revision).toBe(1);
+    expect(prev.frames[0].cells).toEqual({});
+  });
+
+  it("rechaza episodios inexistentes, datos inválidos y no deja temporales", async () => {
+    const { p, eid } = await withEpisode();
+    await expect(store.loadAnimation(p.id, "fantasma")).rejects.toMatchObject({ code: "not-found" });
+    const a = await store.loadAnimation(p.id, eid);
+    await expect(store.saveAnimation(p.id, { ...a, episodeId: "fantasma" })).rejects.toMatchObject({ code: "not-found" });
+    await expect(store.saveAnimation(p.id, { ...a, fps: 0 } as never)).rejects.toMatchObject({ code: "invalid" });
+    await store.saveAnimation(p.id, a);
+    const files = await readdir(join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "episodes"));
+    expect(files.filter((f) => f.endsWith(".tmp"))).toEqual([]);
+  });
+
+  it("un dibujo dañado se informa sin sobrescribirlo", async () => {
+    const { p, eid } = await withEpisode();
+    const a = await store.loadAnimation(p.id, eid);
+    await store.saveAnimation(p.id, a);
+    const file = join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "episodes", `${eid}.json`);
+    await writeFile(file, "{rota");
+    await expect(store.loadAnimation(p.id, eid)).rejects.toMatchObject({ code: "corrupt" });
+    await expect(store.saveAnimation(p.id, a)).rejects.toMatchObject({ code: "corrupt" });
+    expect(await readFile(file, "utf8")).toBe("{rota");
+  });
+
+  it("el proyecto de la Fase 0 no cambia al guardar dibujos (compatibilidad)", async () => {
+    const { p, eid } = await withEpisode();
+    const before = await readFile(join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "project.json"), "utf8");
+    await store.saveAnimation(p.id, await store.loadAnimation(p.id, eid));
+    expect(await readFile(join(root, `${p.id}${PROJECT_DIR_SUFFIX}`, "project.json"), "utf8")).toBe(before);
+  });
+});

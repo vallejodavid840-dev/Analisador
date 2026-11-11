@@ -78,6 +78,10 @@ describe("estudio en escritorio", () => {
 
     // Recargar la página: persistencia real en disco
     await page.reload();
+    // La URL conserva el proyecto abierto: recargar vuelve a él (Fase 1), con todo lo guardado
+    await page.getByTestId("proj-name").waitFor();
+    expect(await page.inputValue("[data-testid=proj-name]")).toBe("Calle Roja");
+    await page.getByRole("button", { name: "← Proyectos" }).click();
     await page.getByText("Calle Roja").waitFor();
     await page.getByText(/12 FPS · 1 temporada · 2 episodios/).waitFor();
     await page.getByRole("button", { name: "Abrir" }).click();
@@ -97,8 +101,7 @@ describe("estudio en escritorio", () => {
     const url = a.page.url();
 
     const b = await newPage({ viewport: { width: 1000, height: 700 } });
-    await b.page.goto(url);
-    await b.page.getByText("Conflicto").first().click({ trial: true }).catch(() => undefined);
+    await b.page.goto(new URL(url).origin); // la URL de A ya apunta a su proyecto: B parte de la lista
     // B abre el mismo proyecto desde la lista
     await b.page.locator(".project-card", { hasText: "Conflicto" }).getByRole("button", { name: "Abrir" }).click();
     await b.page.getByTestId("proj-name").waitFor();

@@ -42,3 +42,19 @@ export const api = {
   load: (id: string) => request<Project>(`/api/projects/${encodeURIComponent(id)}`),
   save: (p: Project) => request<Project>(`/api/projects/${encodeURIComponent(p.id)}`, json("PUT", p)),
 };
+
+import type { Animation } from "@gas/core";
+
+const animUrl = (pid: string, eid: string) => `/api/projects/${encodeURIComponent(pid)}/episodes/${encodeURIComponent(eid)}/animation`;
+
+export const animationApi = {
+  load: (pid: string, eid: string) => request<Animation>(animUrl(pid, eid)),
+  save: (pid: string, a: Animation) => request<{ revision: number }>(animUrl(pid, a.episodeId), json("PUT", a)),
+  /** Envío al cerrar la pestaña: `keepalive` sobrevive a la descarga de la página (límite ~64 KB; si no cabe, queda el borrador local). */
+  saveOnExit: (pid: string, a: Animation): boolean => {
+    const body = JSON.stringify(a);
+    if (body.length > 60_000) return false;
+    void fetch(animUrl(pid, a.episodeId), { method: "PUT", headers: { "content-type": "application/json" }, body, keepalive: true }).catch(() => undefined);
+    return true;
+  },
+};

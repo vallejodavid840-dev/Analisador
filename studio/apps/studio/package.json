@@ -8,6 +8,12 @@
     "build": "tsc -p tsconfig.json && vite build",
     "typecheck": "tsc -p tsconfig.json"
   },
-  "dependencies": { "@gas/core": "*" },
-  "devDependencies": { "vite": "^7.0.0" }
+  "dependencies": {
+    "@gas/core": "*",
+    "@gas/engine": "*",
+    "@gas/render": "*"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
 }

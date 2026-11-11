@@ -1,17 +1,21 @@
-# Arquitectura (estado: Fase 0)
+# Arquitectura (estado: Fase 1)
 
 ```
 apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fastify)
-        │                                                    │
-        └──> @gas/core (modelo, esquemas, migraciones)  <──  @gas/storage (disco)
+   │      │                                                  │
+   │      └──> @gas/engine (operaciones, historial, reproducción)
+   │      └──> @gas/render (pintado de trazos, Canvas2D)    @gas/storage (disco)
+   └──────────> @gas/core (modelo, esquemas, geometría, migraciones) <──┘
 ```
 
-- `packages/core`: TypeScript puro, sin DOM ni Node. Lo usarán el motor y el exportador (Fases 1–2).
+- `packages/core`: TypeScript puro, sin DOM ni Node: esquemas (proyecto y animación), geometría, migraciones.
+- `packages/engine`: operaciones **puras e inmutables** sobre la animación (capas, fotogramas, trazos), historial por instantáneas y reloj de reproducción. Sin DOM.
+- `packages/render`: pinta trazos en cualquier contexto Canvas2D (navegador o Node). Lo reutilizará el exportador de la Fase 2 para que lo exportado sea idéntico a lo que se ve.
 - `packages/storage`: lectura/escritura de proyectos en disco.
 - `apps/server`: API REST local (`/api/projects`) y servidor de la interfaz compilada.
 - `apps/studio`: interfaz en español (`src/es.ts` concentra todos los textos), táctil (objetivos ≥48 px), sin dependencias de UI.
 
-Paquetes previstos y aún **no creados**: `engine`, `render`, `combat`, `audio`, `export` (ver plan por fases).
+Paquetes previstos y aún **no creados**: `combat`, `audio`, `export` (ver plan por fases).
 
 ## Uso
 
@@ -30,4 +34,4 @@ Aviso: el servidor no tiene autenticación; úsalo solo en redes de confianza (`
 
 ## Licencias de dependencias
 
-Todas MIT/Apache-2.0/ISC: fastify, @fastify/static, zod, tsx, vite, typescript, vitest, eslint, typescript-eslint, playwright, concurrently. Revisar con `npm ls` + `npx license-checker` antes de distribuir.
+Todas MIT/Apache-2.0/ISC: fastify, @fastify/static, zod, tsx, vite, typescript, vitest, eslint, typescript-eslint, playwright, concurrently, @napi-rs/canvas (solo en tests). Revisar con `npm ls` + `npx license-checker` antes de distribuir.

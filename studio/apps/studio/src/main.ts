@@ -2,6 +2,8 @@ import { FPS_PRESETS, addEpisode, addSeason, type Project } from "@gas/core";
 import { api, type ApiError, type SummaryRow } from "./api";
 import { h } from "./dom";
 import { es } from "./es";
+import { openEditor } from "./editor/editor";
+import "./editor/editor.css";
 import { logoMark } from "./logo";
 import "./styles.css";
 
@@ -72,7 +74,7 @@ async function showHome(note?: string): Promise<void> {
               `${s.fps} FPS · ${es.seasonsCount(s.seasons)} · ${es.episodes(s.episodes)} · ${es.updated} ${fmtDate(s.updatedAt)}`,
             ),
           ),
-          h("button", { class: "btn", type: "button", onclick: () => void openProject(s.id) }, es.open),
+          h("button", { class: "btn", type: "button", onclick: () => go(`#/p/${s.id}`) }, es.open),
         ),
       );
     } else if (row.error) {
@@ -115,7 +117,7 @@ async function showHome(note?: string): Promise<void> {
     const [w, hh] = resSelect.value.split("x").map(Number);
     try {
       const p = await api.create({ name: nameInput.value, settings: { fps: Number(fpsSelect.value), width: w!, height: hh! } });
-      await openProject(p.id);
+      go(`#/p/${p.id}`);
     } catch (err) {
       formMsg.append(errorBox((err as Error).message));
     }
@@ -192,6 +194,15 @@ function showProject(status?: { text: string; error?: boolean }): void {
     await openProject(p.id);
   }
 
+  /** Abre el editor de dibujo. Si hay cambios del proyecto sin guardar (p. ej. un episodio recién creado), los guarda antes. */
+  async function drawEpisode(_seasonId: string, episodeId: string): Promise<void> {
+    if (isDirty()) {
+      await doSave();
+      if (isDirty()) return; // no se pudo guardar: se queda aquí y muestra el error
+    }
+    go(`#/p/${c.project.id}/e/${episodeId}`);
+  }
+
   const nameInput = h("input", { id: "proj-name", type: "text", maxlength: 120, value: p.name, "data-testid": "proj-name", oninput: (e) => update({ ...c.project, name: (e.target as HTMLInputElement).value }) });
 
   const seasonsEl = h("div", { class: "seasons" });
@@ -201,10 +212,11 @@ function showProject(status?: { text: string; error?: boolean }): void {
     if (s.episodes.length === 0) ep.append(h("li", { class: "empty" }, es.noEpisodes));
     for (const e of s.episodes) {
       ep.append(
-        h("li", {}, h("input", { type: "text", maxlength: 120, value: e.title, "aria-label": es.episodeTitle, "data-testid": "episode-title", oninput: (ev) => {
+        h("li", { class: "episode-row" }, h("input", { type: "text", maxlength: 120, value: e.title, "aria-label": es.episodeTitle, "data-testid": "episode-title", oninput: (ev) => {
           const title = (ev.target as HTMLInputElement).value;
           update({ ...c.project, seasons: c.project.seasons.map((x) => x.id === s.id ? { ...x, episodes: x.episodes.map((y) => y.id === e.id ? { ...y, title } : y) } : x) });
-        } })),
+        } }),
+        h("button", { class: "btn btn-primary", type: "button", "data-testid": "draw", onclick: () => void drawEpisode(s.id, e.id) }, es.draw)),
       );
     }
     seasonsEl.append(
@@ -226,7 +238,7 @@ function showProject(status?: { text: string; error?: boolean }): void {
   render(
     shell(
       h("div", { class: "project-head" },
-        h("button", { class: "btn", type: "button", onclick: () => void showHome() }, es.back),
+        h("button", { class: "btn", type: "button", onclick: () => go("") }, es.back),
         h("div", { class: "save-bar" }, saveMsg, saveBtn),
       ),
       extra,
@@ -250,4 +262,44 @@ function showProject(status?: { text: string; error?: boolean }): void {
   if (status && !status.error) saveMsg.textContent = status.text;
 }
 
-void showHome();
+/* ───────────── Rutas (la URL conserva dónde estabas: recargar reabre lo mismo) ───────────── */
+
+let disposeEditor: (() => void) | null = null;
+
+function go(hash: string): void {
+  history.pushState(null, "", hash || location.pathname + location.search);
+  void route();
+}
+
+async function showEditor(projectId: string, episodeId: string): Promise<void> {
+  try {
+    const project = await api.load(projectId);
+    const episode = project.seasons.flatMap((s) => s.episodes).find((e) => e.id === episodeId);
+    if (!episode) {
+      await showHome(`${es.loadError}: episodio no encontrado`);
+      return;
+    }
+    current = null;
+    disposeEditor = await openEditor(root, {
+      projectId,
+      projectName: project.name,
+      episodeId,
+      episodeTitle: episode.title,
+      onExit: () => go(`#/p/${projectId}`),
+    });
+  } catch (err) {
+    await showHome(`${es.loadError}: ${(err as Error).message}`);
+  }
+}
+
+async function route(): Promise<void> {
+  disposeEditor?.();
+  disposeEditor = null;
+  const m = /^#\/p\/([\w-]+)(?:\/e\/([\w-]+))?$/.exec(location.hash);
+  if (!m) return showHome();
+  if (m[2]) return showEditor(m[1]!, m[2]);
+  return openProject(m[1]!);
+}
+
+window.addEventListener("popstate", () => void route());
+void route();
