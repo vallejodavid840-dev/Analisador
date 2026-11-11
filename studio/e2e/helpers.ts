@@ -20,9 +20,9 @@ export interface Env {
   close(): Promise<void>;
 }
 
-export async function startEnv(): Promise<Env> {
+export async function startEnv(o: { ffmpeg?: { ffmpeg: string; ffprobe: string } } = {}): Promise<Env> {
   const dataDir = await mkdtemp(join(tmpdir(), "gas-e2e-"));
-  const app = await buildApp({ dataDir, staticDir: resolve("apps/studio/dist") });
+  const app = await buildApp({ dataDir, staticDir: resolve("apps/studio/dist"), ...(o.ffmpeg ? { ffmpeg: o.ffmpeg } : {}) });
   await app.listen({ port: 0, host: "127.0.0.1" });
   const base = `http://127.0.0.1:${(app.server.address() as { port: number }).port}`;
   const browser = await chromium.launch(existsSync(PREINSTALLED) ? { executablePath: PREINSTALLED, args: ["--no-sandbox"] } : {});
@@ -133,4 +133,35 @@ export function penEvent(page: Page, type: "pointerdown" | "pointermove" | "poin
     const c = document.querySelector("canvas.stage-canvas")!;
     c.dispatchEvent(new PointerEvent(t as string, { pointerId: pid as number, pointerType: "pen", isPrimary: true, pressure: p as number, clientX: cx as number, clientY: cy as number, buttons: t === "pointerup" ? 0 : 1, button: 0, bubbles: true, cancelable: true }));
   }, [type, x, y, pressure, id] as const);
+}
+
+/** Crea por API un episodio con una animación REAL guardada en disco: un dibujo de color liso por fotograma. */
+export async function seedColors(env: Env, o: { colors: string[]; hold?: number; holds?: number[]; fps?: number; width?: number; height?: number; extraStrokes?: number; name?: string }) {
+  const w = o.width ?? 640;
+  const h = o.height ?? 360;
+  const ep = await createEpisode(env, { name: o.name ?? "Serie", fps: o.fps ?? 24, width: w, height: h });
+  const url = `${env.base}/api/projects/${ep.projectId}/episodes/${ep.episodeId}/animation`;
+  const base = (await (await fetch(url)).json()) as Animation;
+  const layer = base.layers[1]!.id;
+  let seed = 9;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const uid = () => Array.from({ length: 12 }, () => Math.floor(rnd() * 16).toString(16)).join("");
+  const anim: Animation = {
+    ...base,
+    frames: o.colors.map((c, i) => ({
+      id: `f${i}`, hold: o.holds?.[i] ?? o.hold ?? 1,
+      cells: { [layer]: [
+        { id: uid(), kind: "pen", color: c, size: Math.min(h * 2, 2000), opacity: 1, sens: 0, points: [0, h / 2, 1, w, h / 2, 1] },
+        ...Array.from({ length: o.extraStrokes ?? 0 }, () => {
+          const pts: number[] = [];
+          let x = rnd() * w, y = rnd() * h;
+          for (let k = 0; k < 40; k++) { x += (rnd() - 0.5) * 60; y += (rnd() - 0.5) * 60; pts.push(Math.round(x), Math.round(y), 0.8); }
+          return { id: uid(), kind: "pen" as const, color: "#101018", size: 4, opacity: rnd() < 0.3 ? 0.6 : 1, sens: 0.4, points: pts };
+        }),
+      ] },
+    })),
+  };
+  const r = await fetch(url, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(anim) });
+  if (!r.ok) throw new Error(await r.text());
+  return { ...ep, anim };
 }

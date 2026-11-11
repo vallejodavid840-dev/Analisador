@@ -1,6 +1,5 @@
 import type { Animation, Frame, Stroke } from "@gas/core";
-import { strokesOf } from "@gas/engine";
-import { drawStrokes, type CanvasHandle, type Ctx2D, type ScratchProvider } from "@gas/render";
+import { composeFrame, drawStrokes, type CanvasHandle, type Ctx2D, type ScratchProvider } from "@gas/render";
 
 export function createCanvas(w: number, h: number): HTMLCanvasElement {
   const c = document.createElement("canvas");
@@ -135,27 +134,7 @@ export function frameImage(doc: Animation, frame: Frame, o: FrameImageOptions): 
   const h = Math.ceil(doc.height * o.scale);
   const out = createCanvas(w, h);
   const octx = ctxOf(out);
-  if (o.background) {
-    octx.fillStyle = o.background;
-    (octx as unknown as CanvasRenderingContext2D).fillRect(0, 0, w, h);
-  }
-  for (const layer of doc.layers) {
-    if (!layer.visible) continue;
-    const strokes = strokesOf(frame, layer.id);
-    if (strokes.length === 0) continue;
-    const ready = o.layerSource?.(strokes);
-    if (ready) {
-      octx.drawImage(ready, 0, 0, w, h);
-      continue;
-    }
-    const tmp = layerScratch(w, h);
-    tmp.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    tmp.ctx.globalCompositeOperation = "source-over";
-    tmp.ctx.globalAlpha = 1;
-    tmp.ctx.clearRect(0, 0, w, h);
-    drawStrokes(tmp.ctx, strokes, { pixelWidth: w, pixelHeight: h, scale: o.scale, scratch: opacityScratch });
-    octx.drawImage(tmp.canvas, 0, 0);
-  }
+  composeFrame(octx, doc.layers, frame, { pixelWidth: w, pixelHeight: h, scale: o.scale, background: o.background ?? null, layerScratch, opacityScratch, ...(o.layerSource ? { layerSource: o.layerSource } : {}) });
   if (o.tint) {
     octx.globalCompositeOperation = "source-in";
     octx.fillStyle = o.tint;

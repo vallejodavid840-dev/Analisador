@@ -11,7 +11,8 @@
   "dependencies": {
     "@gas/core": "*",
     "@gas/engine": "*",
-    "@gas/render": "*"
+    "@gas/render": "*",
+    "@gas/export": "*"
   },
   "devDependencies": {
     "vite": "^7.0.0"

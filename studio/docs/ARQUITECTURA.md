@@ -1,10 +1,12 @@
-# Arquitectura (estado: Fase 1)
+# Arquitectura (estado: Fase 2)
 
 ```
 apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fastify)
    │      │                                                  │
    │      └──> @gas/engine (operaciones, historial, reproducción)
-   │      └──> @gas/render (pintado de trazos, Canvas2D)    @gas/storage (disco)
+   │      └──> @gas/render (pintado de trazos y fotogramas, Canvas2D)    @gas/storage (disco)
+   │                          ▲                                                  ▲
+   │                  @gas/export (plan, FFmpeg, PNG/ZIP, proceso hijo) ── apps/server (ExportManager)
    └──────────> @gas/core (modelo, esquemas, geometría, migraciones) <──┘
 ```
 
@@ -15,7 +17,9 @@ apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fas
 - `apps/server`: API REST local (`/api/projects`) y servidor de la interfaz compilada.
 - `apps/studio`: interfaz en español (`src/es.ts` concentra todos los textos), táctil (objetivos ≥48 px), sin dependencias de UI.
 
-Paquetes previstos y aún **no creados**: `combat`, `audio`, `export` (ver plan por fases).
+- `packages/export`: exportación a MP4/WebM/PNG/ZIP (ver `docs/EXPORTACION.md`). `@gas/export/plan` es puro y también lo usa la interfaz.
+
+Paquetes previstos y aún **no creados**: `combat`, `audio` (ver plan por fases).
 
 ## Uso
 
@@ -34,4 +38,4 @@ Aviso: el servidor no tiene autenticación; úsalo solo en redes de confianza (`
 
 ## Licencias de dependencias
 
-Todas MIT/Apache-2.0/ISC: fastify, @fastify/static, zod, tsx, vite, typescript, vitest, eslint, typescript-eslint, playwright, concurrently, @napi-rs/canvas (solo en tests). Revisar con `npm ls` + `npx license-checker` antes de distribuir.
+Todas MIT/Apache-2.0/ISC: fastify, @fastify/static, zod, tsx, vite, typescript, vitest, eslint, typescript-eslint, playwright, concurrently, @napi-rs/canvas, yazl. Externo (no incluido): FFmpeg (LGPL/GPL según compilación). Revisar con `npm ls` + `npx license-checker` antes de distribuir.

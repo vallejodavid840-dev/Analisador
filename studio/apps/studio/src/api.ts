@@ -1,4 +1,4 @@
-import type { NewProject, Project } from "@gas/core";
+import type { ExportCapabilitiesDTO, ExportFileDTO, ExportJobDTO, ExportOptions, NewProject, Project } from "@gas/core";
 
 export interface SummaryRow {
   summary?: { id: string; name: string; updatedAt: string; fps: number; seasons: number; episodes: number };
@@ -57,4 +57,41 @@ export const animationApi = {
     void fetch(animUrl(pid, a.episodeId), { method: "PUT", headers: { "content-type": "application/json" }, body, keepalive: true }).catch(() => undefined);
     return true;
   },
+};
+
+export class ExportApiError extends ApiError {
+  constructor(
+    message: string,
+    status: number,
+    code: string,
+    readonly suggestion?: string,
+  ) {
+    super(message, status, code);
+  }
+}
+
+async function exportRequest<T>(url: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } catch {
+    throw new ExportApiError("No hay conexión con el servidor del estudio", 0, "network");
+  }
+  const body: unknown = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const b = body as { message?: string; error?: string; suggestion?: string };
+    throw new ExportApiError(b.message ?? `Error ${res.status}`, res.status, b.error ?? "unknown", b.suggestion);
+  }
+  return body as T;
+}
+
+const P = encodeURIComponent;
+
+export const exportApi = {
+  capabilities: () => exportRequest<ExportCapabilitiesDTO>("/api/export/capabilities"),
+  start: (pid: string, eid: string, o: ExportOptions) => exportRequest<ExportJobDTO>(`/api/projects/${P(pid)}/episodes/${P(eid)}/exports`, json("POST", o)),
+  job: (id: string) => exportRequest<ExportJobDTO>(`/api/exports/${P(id)}`),
+  cancel: (id: string) => exportRequest<ExportJobDTO>(`/api/exports/${P(id)}/cancel`, { method: "POST" }),
+  list: (pid: string, eid: string) => exportRequest<{ files: ExportFileDTO[]; jobs: ExportJobDTO[] }>(`/api/projects/${P(pid)}/exports?episode=${P(eid)}`),
+  fileUrl: (pid: string, name: string, inline = false) => `/api/projects/${P(pid)}/exports/files/${P(name)}${inline ? "?inline=1" : ""}`,
 };

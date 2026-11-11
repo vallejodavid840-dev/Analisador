@@ -6,6 +6,7 @@ import { logoMark } from "../logo";
 import { AutoSave, type SaveStatus } from "./autosave";
 import { deleteDraft, draftKey, getDraft } from "./drafts";
 import { icon, type IconName } from "./icons";
+import { openExportDialog } from "./export-dialog";
 import { InputController } from "./input";
 import { LayersPanel } from "./layers";
 import { EditorModel, loadPrefs, type Tool } from "./model";
@@ -133,11 +134,18 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
   const statusEl = h("span", { class: "save-chip", "data-testid": "save-status", role: "status", "aria-live": "polite" });
   const undoBtn = iconBtn("undo", `${T.undo} (Ctrl+Z)`, () => undo(), { testid: "undo" });
   const redoBtn = iconBtn("redo", `${T.redo} (Ctrl+Mayús+Z)`, () => redo(), { testid: "redo" });
+  let exportClose: (() => void) | null = null;
+  const exportBtn = iconBtn("export", "Exportar episodio a vídeo o imágenes", () => {
+    if (exportClose) return;
+    input.cancel();
+    player.pause();
+    void openExportDialog({ projectId: opts.projectId, episodeId: opts.episodeId, episodeTitle: opts.episodeTitle, model, autosave, onClose: () => (exportClose = null) }).then((c) => (exportClose = c));
+  }, { testid: "export-open", cls: "export-btn", text: es.editor.exportBtn });
   const top = h("header", { class: "editor-top" },
     h("button", { type: "button", class: "btn back", "data-testid": "exit", "aria-label": "Volver al proyecto", onclick: () => void exit() }, h("span", {}, "←"), h("span", { class: "back-text" }, " Proyecto")),
     h("span", { class: "brand-mini" }, logoMark()),
     h("div", { class: "doc-title" }, h("strong", {}, opts.episodeTitle), h("span", {}, opts.projectName)),
-    statusEl, undoBtn, redoBtn);
+    statusEl, exportBtn, undoBtn, redoBtn);
 
   const editor = h("div", { class: "editor", "data-testid": "editor" }, top, toolbar, stage, side, timeline.el);
   root.replaceChildren(editor);
@@ -205,6 +213,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
 
   /* ───── teclado ───── */
   const onKey = (e: KeyboardEvent) => {
+    if (exportClose) return; // con la ventana de exportación abierta, los atajos del editor no actúan
     const typing = isTyping(e.target);
     const mod = e.ctrlKey || e.metaKey;
     const k = e.key.toLowerCase();
@@ -246,6 +255,7 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
     if (disposed) return;
     disposed = true;
     player.pause();
+    exportClose?.();
     input.dispose();
     viewport.dispose();
     unsub();

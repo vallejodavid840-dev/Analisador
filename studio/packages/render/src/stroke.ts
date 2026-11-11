@@ -19,6 +19,7 @@ export interface Ctx2D {
   fill(): void;
   stroke(): void;
   clearRect(x: number, y: number, w: number, h: number): void;
+  fillRect(x: number, y: number, w: number, h: number): void;
   drawImage(image: unknown, ...args: number[]): void;
 }
 

@@ -10,6 +10,7 @@ Un proyecto es una **carpeta** `<id>.gangstudio/` con JSON versionado. Formato a
   scenes/           (Fase 5)
   episodes/<idEpisodio>.json   dibujo y animación del episodio (Fase 1)
   episodes/<idEpisodio>.json.prev   copia de la versión anterior (se renueva en cada guardado)
+  exports/          vídeos e imágenes exportados (Fase 2); `.tmp-*` son temporales y se limpian solos
   assets/           (imágenes, audio)
 ```
 
