@@ -63,7 +63,7 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 - Voz por defecto: una sola voz masculina (David), sin duetos ni cambios de cantante salvo petición.
 - Géneros: rap/barrio (flow natural, lenguaje directo y auténtico, groserías moderadas con sentido, historias creíbles; referencias de ambiente: Santa Fe Klan, C-Kan, Cartel de Santa, sin copiar nada); cumbia (coros pegajosos, adulta, nada infantil ni instrucciones de baile); pop-folk/indie folk (acústico, cálido, no volverlo balada triste); romance (situaciones y recuerdos reales, sin declaraciones literales).
 - Con letra/audio de referencia: analizar primero (tema, historia, género, ritmo, tempo, métrica, rimas, estructura, coro, pausas, lenguaje explícito) y crear algo 100% original.
-- Entrega: TÍTULO, LETRA (con etiquetas Suno), ESTILO MUSICAL PARA SUNO (género, instrumentos, tempo, ambiente, voz, cadencia, energía, producción; coherente y sin contradicciones), CONTROL FINAL (caracteres exactos, género, voz, rimas, métrica, naturalidad, estructura). Hacer las revisiones de verdad, no simularlas.
+- Entrega: TÍTULO, QUIÉN CANTA (personaje/artista ficticio y tipo de voz; OBLIGATORIO siempre), PARA QUIÉN/DE QUÉ ES LA CANCIÓN (1 línea: quién habla, a quién y dónde cae en la historia), LETRA (con etiquetas Suno), ESTILO MUSICAL PARA SUNO (género, instrumentos, tempo, ambiente, voz, cadencia, energía, producción; coherente y sin contradicciones), CONTROL FINAL (caracteres exactos, género, voz, rimas, métrica, naturalidad, estructura). Hacer las revisiones de verdad, no simularlas.
 
 # Álbumes y títulos
 - Proyecto de 900+ canciones, organizadas en álbumes (yo decido nombre del álbum y cuántas canciones lleva). Plan: álbumes de ~15 canciones (~60 álbumes).
@@ -81,3 +81,7 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 - 13 canciones, géneros y voces variados (rap, trap, pop-folk, cumbia, balada rap, etc.), voces/personajes ficticios distintos; una sola voz por canción salvo pedido.
 - Portadas: SIN caras (siluetas, de espaldas, dibujo/gouache/ilustración), nada de personas reales ni texto dentro de la imagen.
 - Pista 1: "El Ojo" (letra hecha con la referencia "somos de calle": coro 3 veces, versos largos de pares).
+
+## Quién canta cada canción de "Línea 04" (ficticios, una voz por canción)
+1 El Ojo (voz vieja, grave) | 2 Rafita (niño-joven cálido, pop-folk) | 3 Los Andenes (cumbia, voz media) | 4 Rafa adolescente "el Porfiado" (rasposa, trap) | 5 Vale, la chica del vagón (voz femenina) | 6 Rafa adulto (seguro, hip-hop) | 7 Cuatro voces, una por zona | 8 El Compa Chuy (cómico, cumbia adulta) | 9 El Cronista (rap narrativo) | 10 Rafa adulto suave (pop-folk) | 11 Memo, el traidor (tenso, trap duro) | 12 Rafa adulto (lento) | 13 Otro chavito, nuevo Rafita.
+Detalles canon pista 2: don Chuy renta un poni en la plaza del Sur (10 pesos); Rafa niño con camiseta de rayas y tenis rosas gastados; el abuelo le cuelga la herradura de su yegua Canela ("no es de suerte, es de aguante").
