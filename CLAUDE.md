@@ -40,12 +40,15 @@ Todas las canciones se basan en una historia que yo voy construyendo mentalmente
 - Nació en el **Sur**. Chico callado, no se lleva con casi nadie, reservado.
 - Vive con sus papás y sus hermanos: es el **mayor**; tiene 1 hermana mediana y 1 hermano pequeño.
 
-## Los 5 amigos (todos del Sur, se llevan bien con David)
-- Denis, Alex, Sebastián, Jairo y otro Alex (pendiente: confirmar si el segundo es otro Alex o un nombre distinto, y qué apodo/rol tiene cada uno).
+## Los amigos (CORREGIDO, todos del Sur)
+- David + 4 amigos = 5 en total: **David, Alex, Denis, Jairo y Sebastián**. Solo hay UN Alex.
 
-## Hermanos: hermana mediana y hermano pequeño (nombres pendientes).
-- Etiqueta/lema del barrio: "Desde el 04, pa' toda la raza" (usar cuando corresponda).
-- Existe algo llamado "R.T Records" (pendiente: confirmar si es sello/crew y qué son "los 5").
+## Familia de David
+- Papás; hermana mediana **Alejandra**; hermano pequeño **Matías**. David es el mayor.
+
+## RT Records
+- Es la disquera/sello que los 5 fundarán a futuro. (Aún no existe en la historia presente.)
+- Lema del barrio: "Desde el 04, pa' toda la raza" (usar cuando corresponda).
 
 ## Canción 1 (escena canon): "Me Tocó a Mí"
 Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas famosos (casi nadie iba por la delincuencia). Había varios raperos. David y los 5 amigos lo acompañaron, hicieron fila y le tocó a él cantar.
@@ -66,3 +69,6 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 - Proyecto de 900+ canciones, organizadas en álbumes (yo decido nombre del álbum y cuántas canciones lleva). Plan: álbumes de ~15 canciones (~60 álbumes).
 - Nombres de álbum y de canción: que NO suenen a IA (cortos, de calle, concretos).
 - Álbum 1: "Desde el 04" (provisional). Pista 1: "Me Tocó a Mí".
+
+# Regla extra
+- Si el usuario no manda letra de referencia, NO inventar una: pedirla o usar solo la historia. Con referencia: analizar primero y escribir algo original (no copiar frases; adaptar la jerga al mundo de David, no al dialecto de la referencia).
