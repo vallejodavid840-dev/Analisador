@@ -73,17 +73,11 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 # Regla extra
 - Si el usuario no manda letra de referencia, NO inventar una: pedirla o usar solo la historia. Con referencia: analizar primero y escribir algo original (no copiar frases; adaptar la jerga al mundo de David, no al dialecto de la referencia).
 
-# HISTORIA B (nueva, basada en las portadas): ÁLBUM "Línea 04"
-(FUSIONADA con la Historia A: el protagonista ES David, del Sur. Crew: Alex, Denis, Jairo y Sebastián. Hermanos: Alejandra y Matías. Los 5 fundan R.T Records al final. Mismo mundo de 4 zonas.)
-- Concepto: una línea de metro, la **Línea 04**, cruza las 4 zonas (Sur, Este, Oeste, Norte). Cada canción es una estación/etapa de la vida. Mezcla tragedia, comedia y ficción. Ciclo vida/muerte: el álbum termina donde empieza.
-- **David "el Porfiado"**: chavito terco del Sur, con una herradura dorada colgada (se la dio su abuelo). Crece: niño → vigía/"ojo" en los techos → dinero (la "graduación") → traición → baja del tren. Al final otro chavito con la herradura sube en el Sur (loop).
-- **El Ojo**: símbolo rojo pintado en los túneles; también la voz del viejo jefe que ve quién sube y quién baja (reglas de la Línea, lealtad, pago, traición).
-- 13 canciones, géneros y voces variados (rap, trap, pop-folk, cumbia, balada rap, etc.), voces/personajes ficticios distintos; una sola voz por canción salvo pedido.
-- Portadas: SIN caras (siluetas, de espaldas, dibujo/gouache/ilustración), nada de personas reales ni texto dentro de la imagen.
-- Pista 1: "El Ojo" (letra hecha con la referencia "somos de calle": coro 3 veces, versos largos de pares).
-
-## Quién canta cada canción de "Línea 04" (ficticios, una voz por canción)
-1 El Ojo (voz vieja, grave) | 2 David niño (niño-joven cálido, pop-folk) | 3 Los Andenes (cumbia, voz media) | 4 David adolescente "el Porfiado" (rasposa, trap) | 5 Vale, la chica del vagón (voz femenina) | 6 David adulto (seguro, hip-hop) | 7 Cuatro voces, una por zona | 8 El Compa Chuy (cómico, cumbia adulta) | 9 El Cronista (rap narrativo) | 10 David adulto suave (pop-folk) | 11 Memo, el traidor (tenso, trap duro) | 12 David adulto (lento) | 13 Otro chavito, nuevo David niño.
-Detalles canon pista 2: don Chuy renta un poni en la plaza del Sur (10 pesos); David niño con camiseta de rayas y tenis rosas gastados; el abuelo le cuelga la herradura de su yegua Canela ("no es de suerte, es de aguante").
-
-- Los amigos (Alex, Denis, Jairo, Sebastián) aparecen en las canciones desde la 3 en adelante; R.T Records es el sueño que cumplen al final (canción 12-13).
+# ÁLBUM 1 "Línea 04" (HISTORIA NUEVA, basada en las portadas; REEMPLAZA la versión con Rafa)
+- Personajes SOLO los del usuario: **David** (protagonista, voz principal), **Alex, Denis, Jairo, Sebastián** (crew, los 5 con David), **Alejandra** (hermana mediana), **Matías** (hermano pequeño), **R.T Records** (sello que los 5 fundan). Extras mínimos permitidos: **El Ojo** (símbolo rojo pintado en los túneles / voz del viejo jefe de la Línea) y **Memo** (el traidor). NO usar "Rafa" ni otros protagonistas.
+- Mundo: 4 zonas (Sur, Este, Oeste, Norte) unidas por el metro **Línea 04**. Cada canción es una estación. Mezcla tragedia, comedia y ficción; ciclo vida/muerte: termina donde empieza (Matías toma el micro).
+- Arco: Sur (juramento de los 5) → Este (trabajo, dinero) → Oeste (traición de Memo) → Norte (ajuste de cuentas, se salvan y fundan R.T Records) → Matías hereda el micro.
+- Detalle canon: David niño, poni de don Chuy en la plaza (10 pesos), tenis rosas gastados, herradura de la yegua Canela que le da su abuelo ("no es de suerte, es de aguante").
+- Portadas SIN caras (siluetas/de espaldas/dibujo), sin texto dentro de la imagen.
+- Quién canta (ficticio/personajes): 1 Cinco del Sur: David | 2 Porfiado: David niño (pop-folk) | 3 Estación Sur: Sebastián (cumbia) | 4 Alex y su Plan: Alex (trap) | 5 Cena Fría: Alejandra (voz femenina, pop-folk) | 6 Graduación: Denis (hip-hop irónico) | 7 Cuatro Zonas: varias voces (David, Alex, Denis, Jairo) | 8 Se Me Subió el Humo: Jairo (cumbia cómica adulta) | 9 Tragedia en el Oeste: David (rap narrativo) | 10 Primera Fila: David suave (pop-folk, su jefa) | 11 El Que Baja: Memo, el traidor (trap duro) | 12 Vida y Muerte: David (lento) | 13 Otra Vez el Sur: Matías (cierre, R.T Records fundado).
+- Canción 1 hecha con la referencia "somos de calle": coro primero y repetido 3 veces, versos largos en pares.
