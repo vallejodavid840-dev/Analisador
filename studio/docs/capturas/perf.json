@@ -1,0 +1,15 @@
+{
+  "cpuThrottle": 4,
+  "miss": 564.5,
+  "hit": 0.11500000001396984,
+  "strokes": 600,
+  "perMove": 0.1516666666759799,
+  "worstMove": 2.7999999998137355,
+  "commit": 7.199999999720603,
+  "nextFrame": 56.10000000009313,
+  "total": 97.79999999981374,
+  "penFrameMs": 55.44249999999302,
+  "eraserFrameMs": 55.384999999997675,
+  "penFrameMsNormalCpu": 16.357499999995344,
+  "eraserFrameMsNormalCpu": 16.6875
+}
