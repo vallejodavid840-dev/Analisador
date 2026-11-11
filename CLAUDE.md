@@ -74,14 +74,16 @@ Una vez en la plaza del Sur, por primera vez en años, vinieron muchos artistas 
 - Si el usuario no manda letra de referencia, NO inventar una: pedirla o usar solo la historia. Con referencia: analizar primero y escribir algo original (no copiar frases; adaptar la jerga al mundo de David, no al dialecto de la referencia).
 
 # HISTORIA B (nueva, basada en las portadas): ÁLBUM "Línea 04"
-(La Historia A de David sigue guardada arriba; esta es aparte. Mismo mundo de 4 zonas.)
+(FUSIONADA con la Historia A: el protagonista ES David, del Sur. Crew: Alex, Denis, Jairo y Sebastián. Hermanos: Alejandra y Matías. Los 5 fundan R.T Records al final. Mismo mundo de 4 zonas.)
 - Concepto: una línea de metro, la **Línea 04**, cruza las 4 zonas (Sur, Este, Oeste, Norte). Cada canción es una estación/etapa de la vida. Mezcla tragedia, comedia y ficción. Ciclo vida/muerte: el álbum termina donde empieza.
-- **Rafa "el Porfiado"**: chavito terco del Sur, con una herradura dorada colgada (se la dio su abuelo). Crece: niño → vigía/"ojo" en los techos → dinero (la "graduación") → traición → baja del tren. Al final otro chavito con la herradura sube en el Sur (loop).
+- **David "el Porfiado"**: chavito terco del Sur, con una herradura dorada colgada (se la dio su abuelo). Crece: niño → vigía/"ojo" en los techos → dinero (la "graduación") → traición → baja del tren. Al final otro chavito con la herradura sube en el Sur (loop).
 - **El Ojo**: símbolo rojo pintado en los túneles; también la voz del viejo jefe que ve quién sube y quién baja (reglas de la Línea, lealtad, pago, traición).
 - 13 canciones, géneros y voces variados (rap, trap, pop-folk, cumbia, balada rap, etc.), voces/personajes ficticios distintos; una sola voz por canción salvo pedido.
 - Portadas: SIN caras (siluetas, de espaldas, dibujo/gouache/ilustración), nada de personas reales ni texto dentro de la imagen.
 - Pista 1: "El Ojo" (letra hecha con la referencia "somos de calle": coro 3 veces, versos largos de pares).
 
 ## Quién canta cada canción de "Línea 04" (ficticios, una voz por canción)
-1 El Ojo (voz vieja, grave) | 2 Rafita (niño-joven cálido, pop-folk) | 3 Los Andenes (cumbia, voz media) | 4 Rafa adolescente "el Porfiado" (rasposa, trap) | 5 Vale, la chica del vagón (voz femenina) | 6 Rafa adulto (seguro, hip-hop) | 7 Cuatro voces, una por zona | 8 El Compa Chuy (cómico, cumbia adulta) | 9 El Cronista (rap narrativo) | 10 Rafa adulto suave (pop-folk) | 11 Memo, el traidor (tenso, trap duro) | 12 Rafa adulto (lento) | 13 Otro chavito, nuevo Rafita.
-Detalles canon pista 2: don Chuy renta un poni en la plaza del Sur (10 pesos); Rafa niño con camiseta de rayas y tenis rosas gastados; el abuelo le cuelga la herradura de su yegua Canela ("no es de suerte, es de aguante").
+1 El Ojo (voz vieja, grave) | 2 David niño (niño-joven cálido, pop-folk) | 3 Los Andenes (cumbia, voz media) | 4 David adolescente "el Porfiado" (rasposa, trap) | 5 Vale, la chica del vagón (voz femenina) | 6 David adulto (seguro, hip-hop) | 7 Cuatro voces, una por zona | 8 El Compa Chuy (cómico, cumbia adulta) | 9 El Cronista (rap narrativo) | 10 David adulto suave (pop-folk) | 11 Memo, el traidor (tenso, trap duro) | 12 David adulto (lento) | 13 Otro chavito, nuevo David niño.
+Detalles canon pista 2: don Chuy renta un poni en la plaza del Sur (10 pesos); David niño con camiseta de rayas y tenis rosas gastados; el abuelo le cuelga la herradura de su yegua Canela ("no es de suerte, es de aguante").
+
+- Los amigos (Alex, Denis, Jairo, Sebastián) aparecen en las canciones desde la 3 en adelante; R.T Records es el sueño que cumplen al final (canción 12-13).
