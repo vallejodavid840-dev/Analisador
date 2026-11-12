@@ -92,6 +92,18 @@ export function renameLayer(a: Animation, layerId: string, name: string): Animat
   if (!n) throw new EngineError("El nombre no puede estar vacío", "invalid");
   return patchLayer(a, layerId, { name: n.slice(0, 60) });
 }
+/** Propiedades de acabado de la capa (Fase 4). `undefined` en un campo = lo restablece a su valor por defecto. */
+export type LayerFx = { opacity?: number | undefined; blend?: Layer["blend"] | undefined; clip?: boolean | undefined; blur?: number | undefined; part?: string | undefined; group?: string | undefined };
+export function setLayerProps(a: Animation, layerId: string, p: LayerFx): Animation {
+  const i = layerIndex(a, layerId);
+  const next: Layer = { ...a.layers[i]! };
+  for (const k of Object.keys(p) as Array<keyof LayerFx>) {
+    const v = p[k];
+    if (v === undefined || (k === "opacity" && v === 1) || (k === "blend" && v === "normal") || (k === "clip" && v === false) || (k === "blur" && v === 0)) delete (next as Record<string, unknown>)[k];
+    else (next as Record<string, unknown>)[k] = v;
+  }
+  return { ...a, layers: a.layers.map((l, j) => (j === i ? next : l)) };
+}
 export const setLayerVisible = (a: Animation, id: string, visible: boolean) => patchLayer(a, id, { visible });
 export const setLayerLocked = (a: Animation, id: string, locked: boolean) => patchLayer(a, id, { locked });
 

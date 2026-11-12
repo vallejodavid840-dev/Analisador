@@ -257,3 +257,4 @@ export function createProjectStore(rootDir: string): ProjectStore {
     },
   };
 }
+export * from "./characters";

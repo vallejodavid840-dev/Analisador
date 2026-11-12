@@ -237,9 +237,12 @@ export function densify(s: Stroke, maxSeg = 4): Stroke {
   const n = p.length / 3;
   if (n < 2) return s;
   const out: number[] = [p[0]!, p[1]!, p[2]!];
-  for (let i = 1; i < n; i++) {
-    const x0 = p[(i - 1) * 3]!, y0 = p[(i - 1) * 3 + 1]!, q0 = p[(i - 1) * 3 + 2]!;
-    const x1 = p[i * 3]!, y1 = p[i * 3 + 1]!, q1 = p[i * 3 + 2]!;
+  const total = s.kind === "fill" ? n + 1 : n; // un relleno es cerrado: también se subdivide el tramo último→primero
+  for (let i = 1; i < total; i++) {
+    const a = (i - 1) % n;
+    const b = i % n;
+    const x0 = p[a * 3]!, y0 = p[a * 3 + 1]!, q0 = p[a * 3 + 2]!;
+    const x1 = p[b * 3]!, y1 = p[b * 3 + 1]!, q1 = p[b * 3 + 2]!;
     const steps = Math.min(400, Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / maxSeg)));
     for (let k = 1; k <= steps; k++) {
       const t = k / steps;

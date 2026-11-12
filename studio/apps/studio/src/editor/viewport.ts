@@ -1,7 +1,7 @@
 import type { Animation, Rect, Stroke } from "@gas/core";
 import { strokesOf } from "@gas/engine";
-import { compositeInk, drawStrokes, paintPieces, type Ctx2D } from "@gas/render";
-import { LayerCache, cacheScaleFor, ctxOf, frameImage, liveInk, liveScratch, opacityScratch } from "./cache";
+import { clipBaseIndex, clipToMask, compositeInk, drawLayerImage, drawStrokes, paintPieces, type Ctx2D } from "@gas/render";
+import { LayerCache, cacheScaleFor, ctxOf, frameImage, liveInk, liveScratch, opacityScratch, maskScratch, clipScratch } from "./cache";
 import { handlesFor, ROTATE_OFFSET_PX } from "./handles";
 import type { EditorModel } from "./model";
 import { drawRigOverlay } from "./rig-overlay";
@@ -268,14 +268,38 @@ export class Viewport {
     // Capas de abajo a arriba.
     const frame = m.renderedFrame();
     const raw = m.frame;
-    for (const layer of d.layers) {
+    let mask: HTMLCanvasElement | null = null;
+    const px = this.view.zoom * this.dpr; // px de pantalla por unidad (desenfoque de capa)
+    for (let li = 0; li < d.layers.length; li++) {
+      const layer = d.layers[li]!;
+      const clipped = layer.clip === true && clipBaseIndex(d.layers, li) >= 0;
+      if (!clipped) mask = null;
       if (!layer.visible) continue;
       const strokes = strokesOf(frame, layer.id);
       // Capa deformada por el rig: su array es nuevo en cada pose, así que no se cachea (se pinta en un lienzo compartido).
       const deformed = frame !== raw && strokes !== strokesOf(raw, layer.id);
       const bmp = deformed ? this.cache.renderTransient(strokes, d, this.view.zoom * this.dpr) : this.cache.get(strokes, d);
-      if (this.live && this.live.layerId === layer.id) this.drawLiveOnLayer(ctx, bmp, d);
-      else if (bmp) ctx.drawImage(bmp, 0, 0, d.width, d.height);
+      const live = this.live && this.live.layerId === layer.id;
+      if (!clipped && !live && bmp && d.layers[li + 1]?.clip === true) {
+        // la siguiente capa se recorta a esta: copia (el lienzo transitorio se reutiliza para la capa siguiente)
+        const m = maskScratch(bmp.width, bmp.height);
+        m.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        m.ctx.globalCompositeOperation = "source-over";
+        m.ctx.clearRect(0, 0, bmp.width, bmp.height);
+        m.ctx.drawImage(bmp, 0, 0);
+        mask = m.canvas as HTMLCanvasElement;
+      }
+      if (live) this.drawLiveOnLayer(ctx, bmp, d);
+      else if (bmp && clipped) {
+        if (!mask) continue;
+        const t = clipScratch(bmp.width, bmp.height);
+        t.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        t.ctx.globalCompositeOperation = "source-over";
+        t.ctx.clearRect(0, 0, bmp.width, bmp.height);
+        t.ctx.drawImage(bmp, 0, 0);
+        clipToMask(t.ctx, mask, bmp.width, bmp.height);
+        drawLayerImage(ctx as never, t.canvas, layer, d.width, d.height, px);
+      } else if (bmp) drawLayerImage(ctx as never, bmp, layer, d.width, d.height, px);
     }
     ctx.restore();
 

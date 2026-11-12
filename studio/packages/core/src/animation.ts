@@ -1,12 +1,14 @@
 import { z } from "zod";
 import { IdSchema, FpsSchema } from "./schema";
 import { migrate, ProjectFormatError, type Migration } from "./migrate";
+import { CharacterBlockSchema, InstanceSchema } from "./character";
 import { MAX_SKELETONS, PoseKeySchema, SkeletonSchema } from "./rig";
 
 /** Versión del formato de `episodes/<id>.json`. Independiente de la del proyecto. */
-export const ANIMATION_SCHEMA_VERSION = 2;
+export const ANIMATION_SCHEMA_VERSION = 3;
 
-export const MAX_LAYERS = 64;
+/** Fase 4: 128 (antes 64) para poder tener varios personajes con sus capas de sombra en un episodio. */
+export const MAX_LAYERS = 128;
 export const MAX_FRAMES = 2000;
 export const MAX_HOLD = 48;
 
@@ -17,10 +19,11 @@ const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Color no válido");
  * en píxeles del lienzo (origen arriba-izquierda). Presión 0–1 (ratón = 1).
  * Ancho en cada punto = size · (1 − sens · (1 − presión)).
  * `eraser` borra lo que hay debajo dentro de su capa (no destructivo: deshacer es exacto).
+ * `fill` (Fase 4) es una forma cerrada rellena: `points` es su contorno (el último punto se une con el primero).
  */
 export const StrokeSchema = z.object({
   id: IdSchema,
-  kind: z.enum(["pen", "eraser"]),
+  kind: z.enum(["pen", "eraser", "fill"]),
   color: HexColor,
   size: z.number().min(0.1).max(2000),
   opacity: z.number().min(0).max(1),
@@ -37,6 +40,18 @@ export const LayerSchema = z.object({
   name: z.string().trim().min(1).max(60),
   visible: z.boolean(),
   locked: z.boolean(),
+  /** Fase 4 (todo opcional: ausente = normal). Opacidad de la capa entera. */
+  opacity: z.number().min(0).max(1).optional(),
+  /** Modo de mezcla con lo de debajo (sombras = multiplicar, luces = trama/aclarar, brillos = sumar). */
+  blend: z.enum(["normal", "multiply", "screen", "overlay", "add"]).optional(),
+  /** Recorta la capa a lo dibujado en la capa base de debajo (sombras que no se salen de la prenda). */
+  clip: z.boolean().optional(),
+  /** Desenfoque en unidades del lienzo (sombras suaves). 0 = duro. */
+  blur: z.number().min(0).max(60).optional(),
+  /** Parte del personaje a la que pertenece (head, eyes, brows, mouth, hair-front, torso…). */
+  part: z.string().trim().min(1).max(40).optional(),
+  /** Agrupa las capas de un mismo personaje/prenda al insertarlas en episodios. */
+  group: z.string().trim().min(1).max(60).optional(),
 });
 
 export const FrameSchema = z.object({
@@ -62,6 +77,10 @@ export const AnimationSchema = z.object({
   frames: z.array(FrameSchema).min(1).max(MAX_FRAMES),
   /** Esqueletos y vínculos (Fase 3). Ausente en animaciones anteriores: se leen igual, sin rig. */
   rigs: z.array(SkeletonSchema).max(MAX_SKELETONS).optional(),
+  /** Datos de personaje (Fase 4): solo existe en el dibujo de un personaje de la biblioteca. */
+  character: CharacterBlockSchema.optional(),
+  /** Personajes de la biblioteca insertados en este episodio (Fase 4). */
+  instances: z.array(InstanceSchema).max(12).optional(),
 });
 
 export type Stroke = z.infer<typeof StrokeSchema>;
@@ -108,7 +127,11 @@ export function createAnimation(input: NewAnimation): Animation {
  * válido; la migración solo sube la versión. (Una aplicación anterior rechazará un v2 con «versión más nueva»
  * en vez de descartar el rig en silencio al guardar.)
  */
-export const ANIMATION_MIGRATIONS: readonly Migration[] = [{ from: 1, to: 2, up: (raw) => raw }];
+export const ANIMATION_MIGRATIONS: readonly Migration[] = [
+  { from: 1, to: 2, up: (raw) => raw },
+  /** v2 → v3 (Fase 4): propiedades de capa, trazos «fill» y bloque `character`, todo opcional. */
+  { from: 2, to: 3, up: (raw) => raw },
+];
 
 export function parseAnimation(raw: unknown): Animation {
   const { data } = migrate(raw, ANIMATION_MIGRATIONS, ANIMATION_SCHEMA_VERSION);

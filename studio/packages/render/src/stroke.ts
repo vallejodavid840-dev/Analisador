@@ -66,6 +66,10 @@ export function paintPieces(ctx: Ctx2D, s: Stroke, from: number, to: number): vo
   const n = pointCount(s);
   const p = s.points;
   setupInk(ctx, s);
+  if (s.kind === "fill") {
+    if (from <= 0) paintFill(ctx, s);
+    return;
+  }
   if (n === 1) {
     if (from <= 0 && to >= 1) {
       ctx.beginPath();
@@ -97,6 +101,19 @@ export function paintPieces(ctx: Ctx2D, s: Stroke, from: number, to: number): vo
     ctx.stroke();
     i = j;
   }
+}
+
+/** Forma cerrada rellena: curva cuadrática por los puntos medios (misma suavidad que los trazos), cerrada. */
+export function paintFill(ctx: Ctx2D, s: Stroke): void {
+  const p = s.points;
+  const n = p.length / 3;
+  if (n < 3) return;
+  const mx = (i: number) => (p[(i % n) * 3]! + p[((i + 1) % n) * 3]!) / 2;
+  const my = (i: number) => (p[(i % n) * 3 + 1]! + p[((i + 1) % n) * 3 + 1]!) / 2;
+  ctx.beginPath();
+  ctx.moveTo(mx(n - 1), my(n - 1));
+  for (let i = 0; i < n; i++) ctx.quadraticCurveTo(p[i * 3]!, p[i * 3 + 1]!, mx(i), my(i));
+  ctx.fill();
 }
 
 /** Diferencia de grosor (px) por debajo de la cual dos tramos seguidos se dibujan con el mismo trazado. */

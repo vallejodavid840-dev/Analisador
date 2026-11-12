@@ -34,6 +34,10 @@ export const liveScratch = pooled("live");
 export const liveInk = pooled("ink");
 /** Capas con pose (rig): se pintan en un lienzo reutilizable en vez de guardar un mapa de bits de 8 MB por pose. */
 export const rigScratch = pooled("rig");
+/** Copia de la capa base para recortar capas encima de ella (sombras recortadas a la prenda). */
+export const maskScratch = pooled("mask");
+/** Capa recortada, en el lienzo (a resolución de caché). */
+export const clipScratch = pooled("clip");
 
 /** Resolución interna de los mapas de bits: la del proyecto, con tope de 2048 px en el lado largo. */
 export const cacheScaleFor = (doc: Pick<Animation, "width" | "height">) => Math.min(1, 2048 / Math.max(doc.width, doc.height));
@@ -144,7 +148,7 @@ export interface FrameImageOptions {
 
 /** Fotograma completo (capas visibles) como imagen, cacheado por identidad del fotograma. */
 export function frameImage(doc: Animation, frame: Frame, o: FrameImageOptions): HTMLCanvasElement {
-  const sig = `${doc.layers.map((l) => (l.visible ? l.id : "-")).join(",")}|${o.scale}|${o.tint ?? ""}|${o.background ?? ""}`;
+  const sig = `${doc.layers.map((l) => (l.visible ? `${l.id}${l.opacity ?? 1}${l.blend ?? ""}${l.clip ? "c" : ""}${l.blur ?? 0}` : "-")).join(",")}|${o.scale}|${o.tint ?? ""}|${o.background ?? ""}`;
   let per = frameImages.get(frame);
   if (!per) frameImages.set(frame, (per = new Map()));
   const hit = per.get(sig);
@@ -155,7 +159,7 @@ export function frameImage(doc: Animation, frame: Frame, o: FrameImageOptions): 
   const h = Math.ceil(doc.height * o.scale);
   const out = createCanvas(w, h);
   const octx = ctxOf(out);
-  composeFrame(octx, doc.layers, frame, { pixelWidth: w, pixelHeight: h, scale: o.scale, background: o.background ?? null, layerScratch, opacityScratch, ...(o.layerSource ? { layerSource: o.layerSource } : {}) });
+  composeFrame(octx, doc.layers, frame, { pixelWidth: w, pixelHeight: h, scale: o.scale, background: o.background ?? null, layerScratch, opacityScratch, maskScratch, ...(o.layerSource ? { layerSource: o.layerSource } : {}) });
   if (o.tint) {
     octx.globalCompositeOperation = "source-in";
     octx.fillStyle = o.tint;

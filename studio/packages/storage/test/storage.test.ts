@@ -171,7 +171,7 @@ describe("animaciones por episodio", () => {
   });
 });
 
-describe("compatibilidad con animaciones anteriores (v1 → v2)", () => {
+describe("compatibilidad con animaciones anteriores (v1 → v3)", () => {
   const v1 = (layers: [string, string], extra: object = {}) => ({
     schemaVersion: 1, episodeId: "ep", revision: 3, fps: 12, width: 640, height: 360,
     layers: [{ id: layers[0], name: "Color", visible: true, locked: false }, { id: layers[1], name: "Líneas", visible: true, locked: true }],
@@ -198,7 +198,7 @@ describe("compatibilidad con animaciones anteriores (v1 → v2)", () => {
   it("un dibujo v1 se lee igual (capas, fotogramas, trazos, duraciones) y sin rig", async () => {
     const { p, eid } = await projectWithV1();
     const a = await store.loadAnimation(p.id, eid);
-    expect(a.schemaVersion).toBe(2);
+    expect(a.schemaVersion).toBe(3);
     expect(a.fps).toBe(12);
     expect(a.layers.map((l) => [l.name, l.locked])).toEqual([["Color", false], ["Líneas", true]]);
     expect(a.frames.map((f) => f.hold)).toEqual([2, 1]);
@@ -207,14 +207,14 @@ describe("compatibilidad con animaciones anteriores (v1 → v2)", () => {
     expect(a.frames[0]!.poses).toBeUndefined();
   });
 
-  it("leer NO modifica el archivo; el primer guardado conserva el original en .bak-v1 y guarda como v2", async () => {
+  it("leer NO modifica el archivo; el primer guardado conserva el original en .bak-v1 y guarda como v3", async () => {
     const { p, eid, file, original } = await projectWithV1();
     const a = await store.loadAnimation(p.id, eid);
     expect(await readFile(file, "utf8")).toBe(original); // solo lectura
     await store.saveAnimation(p.id, a);
     expect(await readFile(`${file}.bak-v1`, "utf8")).toBe(original); // original intacto
     const saved = JSON.parse(await readFile(file, "utf8"));
-    expect(saved.schemaVersion).toBe(2);
+    expect(saved.schemaVersion).toBe(3);
     expect(saved.revision).toBe(4);
     expect(saved.frames[0].cells["capa-b"][0].points).toEqual([1, 2, 0.5, 30, 40, 0.9]); // los datos no cambian
     // un segundo guardado NO sobrescribe el .bak-v1

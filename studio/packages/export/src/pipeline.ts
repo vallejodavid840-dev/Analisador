@@ -62,7 +62,7 @@ const cancelled = () => new ExportError("cancelled", "Exportación cancelada.");
 const yieldLoop = () => new Promise<void>((r) => setImmediate(r));
 
 /** Pinta fotogramas con @napi-rs/canvas (Skia) usando el MISMO `composeFrame` que el editor. Sin DOM. */
-class FrameRenderer {
+export class FrameRenderer {
   private readonly canvas: Canvas;
   private readonly ctx: SKRSContext2D;
   private readonly pools = new Map<string, Canvas>();
@@ -102,7 +102,7 @@ class FrameRenderer {
     this.ctx.clearRect(0, 0, this.width, this.height);
     composeFrame(this.ctx as unknown as Ctx2D, this.anim.layers, frame, {
       pixelWidth: this.width, pixelHeight: this.height, scale: this.scale, background: this.background,
-      layerScratch: this.scratch("layer"), opacityScratch: this.scratch("opacity"),
+      layerScratch: this.scratch("layer"), opacityScratch: this.scratch("opacity"), maskScratch: this.scratch("mask"),
     });
   }
 
