@@ -267,10 +267,13 @@ export class Viewport {
 
     // Capas de abajo a arriba.
     const frame = m.renderedFrame();
+    const raw = m.frame;
     for (const layer of d.layers) {
       if (!layer.visible) continue;
       const strokes = strokesOf(frame, layer.id);
-      const bmp = this.cache.get(strokes, d);
+      // Capa deformada por el rig: su array es nuevo en cada pose, así que no se cachea (se pinta en un lienzo compartido).
+      const deformed = frame !== raw && strokes !== strokesOf(raw, layer.id);
+      const bmp = deformed ? this.cache.renderTransient(strokes, d, this.view.zoom * this.dpr) : this.cache.get(strokes, d);
       if (this.live && this.live.layerId === layer.id) this.drawLiveOnLayer(ctx, bmp, d);
       else if (bmp) ctx.drawImage(bmp, 0, 0, d.width, d.height);
     }

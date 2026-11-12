@@ -31,6 +31,8 @@ export class Timeline {
   private lastActive = "";
   /** Identidades de rigs y keyframes en la última actualización: si cambian, las miniaturas con pose se repintan. */
   private rigRefs: readonly unknown[] = [];
+  /** Hay cambios del rig pendientes de reflejar en TODAS las miniaturas (se aplazan mientras se arrastra un hueso). */
+  private rigDirty = false;
   private readonly refs: Record<string, HTMLElement> = {};
   private onionSteppers: Array<{ el: HTMLElement; refresh: () => void }> = [];
   private holdStepper!: { el: HTMLElement; refresh: () => void };
@@ -137,8 +139,12 @@ export class Timeline {
 
     // ¿Cambió algo del rig (esqueleto, vínculos o cualquier keyframe)? Entonces TODAS las miniaturas pueden cambiar (interpolación).
     const refs: unknown[] = [doc.rigs, ...(doc.rigs?.length ? doc.frames.map((fr) => fr.poses) : [])];
-    const rigChanged = refs.length !== this.rigRefs.length || refs.some((r, i) => r !== this.rigRefs[i]);
+    if (refs.length !== this.rigRefs.length || refs.some((r, i) => r !== this.rigRefs[i])) this.rigDirty = true;
     this.rigRefs = refs;
+    // Mientras se arrastra (vista previa continua) solo se repinta la miniatura del fotograma actual; el resto, al soltar.
+    const dragging = m.history.inTransient;
+    const rigChanged = this.rigDirty && !dragging;
+    if (rigChanged) this.rigDirty = false;
 
     // Celdas (reconciliación por id: no se reconstruye lo que no cambió).
     const seen = new Set<string>();
@@ -162,7 +168,7 @@ export class Timeline {
         this.pending.add(f.id);
         this.pump(wasNew || f.id !== m.frameId ? 0 : 140);
       }
-      if (rigChanged && c.frame === f) {
+      if ((rigChanged || (this.rigDirty && dragging && f.id === m.frameId)) && c.frame === f) {
         this.pending.add(f.id);
         this.pump(f.id === m.frameId ? 140 : 40);
       }

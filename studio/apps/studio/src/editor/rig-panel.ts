@@ -84,6 +84,8 @@ export class RigPanel {
   private readonly easeSel = selectField(R.ease, "key-ease", (v) => this.m.setKeyEase(v as Ease));
   private readonly keyList = h("div", { class: "key-list", "data-testid": "key-list" });
   private readonly btns: Record<string, HTMLButtonElement> = {};
+  /** Firmas del contenido de las listas: solo se reconstruyen si cambian (un arrastre no debe recrear 40 filas por movimiento). */
+  private sig = { tree: "", parents: "", bind: "", infl: "", bound: "", keys: "" };
 
   constructor(private readonly m: EditorModel) {
     this.skSelect = h("select", { "data-testid": "rig-skeleton", "aria-label": R.skeleton });
@@ -233,14 +235,18 @@ export class RigPanel {
     this.tCreate.hidden = !editing;
 
     // árbol de huesos
-    const depth = new Map<string, number>();
-    const rows: HTMLElement[] = [];
-    sk.bones.forEach((b, i) => {
-      depth.set(b.id, b.parent ? (depth.get(b.parent) ?? 0) + 1 : 0);
-      rows.push(this.boneRow(b, depth.get(b.id)!, i));
-    });
-    this.tree.replaceChildren(...(rows.length ? rows : [h("li", { class: "hint" }, R.noBones)]));
-    this.tree.querySelector(".bone-row.on")?.scrollIntoView({ block: "nearest" });
+    const treeSig = sk.bones.map((b) => `${b.id}:${b.name}:${b.parent}`).join("|") + `#${m.rig.boneId}`;
+    if (treeSig !== this.sig.tree) {
+      this.sig.tree = treeSig;
+      const depth = new Map<string, number>();
+      const rows: HTMLElement[] = [];
+      sk.bones.forEach((b, i) => {
+        depth.set(b.id, b.parent ? (depth.get(b.parent) ?? 0) + 1 : 0);
+        rows.push(this.boneRow(b, depth.get(b.id)!, i));
+      });
+      this.tree.replaceChildren(...(rows.length ? rows : [h("li", { class: "hint" }, R.noBones)]));
+      this.tree.querySelector(".bone-row.on")?.scrollIntoView({ block: "nearest" });
+    }
 
     // propiedades del hueso
     const b = m.bone;
@@ -251,7 +257,11 @@ export class RigPanel {
       this.poseOnly.forEach((e) => (e.hidden = editing));
       if (document.activeElement !== this.f.name) this.f.name.value = b.name;
       const p = info.sk.bones;
-      this.f.parent.sel.replaceChildren(h("option", { value: "" }, R.root), ...p.filter((x) => x.id !== b.id && !this.isDesc(info.sk.bones, b.id, x.id)).map((x) => h("option", { value: x.id, selected: x.id === b.parent }, x.name)));
+      const parentsSig = `${b.id}|${b.parent}|` + p.map((x) => `${x.id}:${x.name}:${x.parent}`).join(",");
+      if (parentsSig !== this.sig.parents) {
+        this.sig.parents = parentsSig;
+        this.f.parent.sel.replaceChildren(h("option", { value: "" }, R.root), ...p.filter((x) => x.id !== b.id && !this.isDesc(info.sk.bones, b.id, x.id)).map((x) => h("option", { value: x.id, selected: x.id === b.parent }, x.name)));
+      }
       this.f.parent.sel.value = b.parent ?? "";
       this.f.length.set(b.length);
       this.f.angle.set(b.angle);
@@ -278,9 +288,13 @@ export class RigPanel {
     const mine = lb && lb.skeleton.id === sk.id ? lb.binding : null;
     this.bindTitle.textContent = `${R.binding}: «${layer.name}»`;
     const modeWant = `${mine ? mine.mode : "none"}`;
-    this.bindMode.sel.replaceChildren(h("option", { value: "none" }, R.bindNone), h("option", { value: "rigid" }, R.bindRigid), h("option", { value: "skin" }, R.bindSkin));
+    if (this.bindMode.sel.options.length !== 3) this.bindMode.sel.replaceChildren(h("option", { value: "none" }, R.bindNone), h("option", { value: "rigid" }, R.bindRigid), h("option", { value: "skin" }, R.bindSkin));
     this.bindMode.sel.value = modeWant;
-    this.bindBone.sel.replaceChildren(...sk.bones.map((x) => h("option", { value: x.id }, x.name)));
+    const boneSig = sk.bones.map((x) => `${x.id}:${x.name}`).join(",");
+    if (boneSig !== this.sig.bind) {
+      this.sig.bind = boneSig;
+      this.bindBone.sel.replaceChildren(...sk.bones.map((x) => h("option", { value: x.id }, x.name)));
+    }
     this.bindBone.sel.value = mine?.bone ?? m.rig.boneId ?? sk.bones[0]?.id ?? "";
     this.bindBone.el.hidden = !mine;
     this.bindSkinBox.hidden = mine?.mode !== "skin";
@@ -290,22 +304,30 @@ export class RigPanel {
       if (document.activeElement !== this.sharp) this.sharp.value = String(Math.round(mine.sharpness * 10));
       this.softOut.textContent = `${Math.round(mine.softness)} px`;
       this.sharpOut.textContent = mine.sharpness.toFixed(1);
-      this.influences.replaceChildren(...sk.bones.map((x, i) => {
-        const cb = h("input", { type: "checkbox", value: x.id, checked: mine.influences.includes(x.id), "data-testid": "bind-infl" });
-        cb.addEventListener("change", () => this.applyBinding("skin"));
-        return h("label", { class: "check infl-row" }, cb, h("span", { class: "bone-chip", style: `background:${boneColor(i)}` }), h("span", {}, x.name));
-      }));
+      const inflSig = boneSig + "#" + mine.influences.join(",");
+      if (inflSig !== this.sig.infl) {
+        this.sig.infl = inflSig;
+        this.influences.replaceChildren(...sk.bones.map((x, i) => {
+          const cb = h("input", { type: "checkbox", value: x.id, checked: mine.influences.includes(x.id), "data-testid": "bind-infl" });
+          cb.addEventListener("change", () => this.applyBinding("skin"));
+          return h("label", { class: "check infl-row" }, cb, h("span", { class: "bone-chip", style: `background:${boneColor(i)}` }), h("span", {}, x.name));
+        }));
+      }
     }
     // lista de capas vinculadas
-    this.boundList.replaceChildren(...(sk.bindings.length
-      ? sk.bindings.map((bd) => {
-          const l = m.doc.layers.find((x) => x.id === bd.layerId);
-          const bn = sk.bones.find((x) => x.id === bd.bone);
-          const idx = sk.bones.findIndex((x) => x.id === bd.bone);
-          return h("li", {}, h("button", { type: "button", class: "bound-row", "data-testid": "bound-row", onclick: () => m.setLayer(bd.layerId) },
-            h("span", { class: "bone-chip", style: `background:${boneColor(idx)}` }), h("span", {}, `${l?.name ?? "?"} → ${bn?.name ?? "?"}`), h("em", {}, bd.mode === "skin" ? "deformable" : "rígido")));
-        })
-      : [h("li", { class: "hint" }, R.noBound)]));
+    const boundSig = sk.bindings.map((bd) => `${bd.layerId}:${bd.bone}:${bd.mode}`).join(",") + "#" + m.doc.layers.map((l) => `${l.id}:${l.name}`).join(",");
+    if (boundSig !== this.sig.bound) {
+      this.sig.bound = boundSig;
+      this.boundList.replaceChildren(...(sk.bindings.length
+        ? sk.bindings.map((bd) => {
+            const l = m.doc.layers.find((x) => x.id === bd.layerId);
+            const bn = sk.bones.find((x) => x.id === bd.bone);
+            const idx = sk.bones.findIndex((x) => x.id === bd.bone);
+            return h("li", {}, h("button", { type: "button", class: "bound-row", "data-testid": "bound-row", onclick: () => m.setLayer(bd.layerId) },
+              h("span", { class: "bone-chip", style: `background:${boneColor(idx)}` }), h("span", {}, `${l?.name ?? "?"} → ${bn?.name ?? "?"}`), h("em", {}, bd.mode === "skin" ? "deformable" : "rígido")));
+          })
+        : [h("li", { class: "hint" }, R.noBound)]));
+    }
 
     // poses
     const i = m.frameIndex;
@@ -318,7 +340,11 @@ export class RigPanel {
     this.easeSel.el.hidden = !keyed;
     if (keyed) this.easeSel.sel.value = m.doc.frames[i]!.poses![sk.id]!.ease;
     const keys = m.keyFrameList;
-    this.keyList.replaceChildren(...(keys.length ? keys.map((k) => h("button", { type: "button", class: `chip ${k === i ? "on" : ""}`, "data-testid": "key-chip", onclick: () => m.setFrameIndex(k) }, String(k + 1))) : [h("span", { class: "hint" }, R.noKeys)]));
+    const keysSig = keys.join(",") + "#" + i;
+    if (keysSig !== this.sig.keys) {
+      this.sig.keys = keysSig;
+      this.keyList.replaceChildren(...(keys.length ? keys.map((k) => h("button", { type: "button", class: `chip ${k === i ? "on" : ""}`, "data-testid": "key-chip", onclick: () => m.setFrameIndex(k) }, String(k + 1))) : [h("span", { class: "hint" }, R.noKeys)]));
+    }
   }
 
   private isDesc(bones: readonly Bone[], root: string, id: string): boolean {

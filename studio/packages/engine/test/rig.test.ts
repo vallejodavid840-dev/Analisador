@@ -339,7 +339,7 @@ describe("deformación por pesos (skinning de los puntos de los trazos)", () => 
     a = setPose(a, 0, skId, { up: { r: 0 }, lo: { r: 90 } });
     const out = posedFrame(a, 0).cells[layerId]![0]!;
     const n = out.points.length / 3;
-    expect(n).toBeGreaterThan(40); // subdividido
+    expect(n).toBeGreaterThan(20); // subdividido (muestreo ≈ softness/2.5 = 8 px): de 2 puntos a ~26
     const P = (i: number): Vec => [out.points[i * 3]!, out.points[i * 3 + 1]!];
     nearV(P(0), [100, 100], 1); // el hombro no se mueve
     // la muñeca está casi enteramente ligada al antebrazo: debería quedar cerca de (200,200)
@@ -371,7 +371,7 @@ describe("deformación por pesos (skinning de los puntos de los trazos)", () => 
     const sPts = posedFrame(skin.a, 0).cells[skin.layerId]![0]!.points;
     const rPts = posedFrame(rigid.a, 0).cells[rigid.layerId]![0]!.points;
     expect(rPts.length).toBe(6); // rígido: los mismos 2 puntos (solo se transforman)
-    expect(sPts.length).toBeGreaterThan(100); // deformable: subdividido
+    expect(sPts.length).toBeGreaterThan(60); // deformable: subdividido
     // con rigid vinculado a «up», una rotación de «lo» no mueve nada: la capa solo sigue a su hueso
     expect(posedFrame(rigid.a, 0)).toBe(rigid.a.frames[0]);
   });

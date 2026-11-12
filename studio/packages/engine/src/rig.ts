@@ -273,12 +273,17 @@ export function pointWeights(x: number, y: number, bones: readonly BoneState[], 
   return out;
 }
 
+/** Influencias máximas por punto (estándar en skinning): acota el coste a O(puntos · 4), sin depender del nº de huesos. */
+export const MAX_INFLUENCES = 4;
+
 interface SkinData {
   bonesRef: readonly Bone[];
   ids: string[];
   strokes: Stroke[];
-  /** Por trazo: pesos intercalados [punto0·k, punto1·k, …]. */
+  /** Por trazo y punto: índices (en `ids`) y pesos de sus `k` huesos más influyentes, ya normalizados. */
+  idx: Uint8Array[];
   weights: Float32Array[];
+  k: number;
 }
 const skinCache = new WeakMap<readonly Stroke[], WeakMap<Binding, SkinData>>();
 
@@ -291,28 +296,54 @@ function skinData(strokes: readonly Stroke[], binding: Binding, sk: Pick<Skeleto
   const ids = [...new Set([binding.bone, ...binding.influences])].filter((id) => rest.has(id));
   if (ids.length === 0) return null;
   const states = ids.map((id) => rest.get(id)!);
+  const n = ids.length;
+  const K = Math.min(MAX_INFLUENCES, n);
+  // Con zona de mezcla de `softness` px, muestrear cada ~softness/2.5 basta para captar la curva de la articulación.
+  const seg = Math.min(12, Math.max(3, binding.softness / 2.5));
   const dens: Stroke[] = [];
+  const idxs: Uint8Array[] = [];
   const weights: Float32Array[] = [];
-  const tmp = new Array<number>(ids.length);
+  const raw = new Float64Array(n);
+  const topI = new Int32Array(K);
+  const topW = new Float64Array(K);
   for (const s of strokes) {
-    const d = densify(s);
-    const w = new Float32Array((d.points.length / 3) * ids.length);
-    for (let i = 0; i < d.points.length / 3; i++) {
-      pointWeights(d.points[i * 3]!, d.points[i * 3 + 1]!, states, binding.softness, binding.sharpness, tmp);
-      for (let k = 0; k < ids.length; k++) w[i * ids.length + k] = tmp[k]!;
+    const d = densify(s, seg);
+    const m = d.points.length / 3;
+    const ix = new Uint8Array(m * K);
+    const w = new Float32Array(m * K);
+    for (let i = 0; i < m; i++) {
+      pointWeights(d.points[i * 3]!, d.points[i * 3 + 1]!, states, binding.softness, binding.sharpness, raw);
+      // los K mayores (inserción en una lista pequeña)
+      let used = 0;
+      for (let j = 0; j < n; j++) {
+        const v = raw[j]!;
+        if (used < K) {
+          let p = used++;
+          while (p > 0 && topW[p - 1]! < v) { topW[p] = topW[p - 1]!; topI[p] = topI[p - 1]!; p--; }
+          topW[p] = v; topI[p] = j;
+        } else if (v > topW[K - 1]!) {
+          let p = K - 1;
+          while (p > 0 && topW[p - 1]! < v) { topW[p] = topW[p - 1]!; topI[p] = topI[p - 1]!; p--; }
+          topW[p] = v; topI[p] = j;
+        }
+      }
+      let sum = 0;
+      for (let j = 0; j < K; j++) sum += topW[j]!;
+      for (let j = 0; j < K; j++) { ix[i * K + j] = topI[j]!; w[i * K + j] = topW[j]! / sum; }
     }
     dens.push(d);
+    idxs.push(ix);
     weights.push(w);
   }
-  const data: SkinData = { bonesRef: sk.bones, ids, strokes: dens, weights };
+  const data: SkinData = { bonesRef: sk.bones, ids, strokes: dens, idx: idxs, weights, k: K };
   per.set(binding, data);
   return data;
 }
 
 /** Pesos y trazos subdivididos de un vínculo deformable (para visualizar las influencias). */
-export function skinPreview(strokes: readonly Stroke[], binding: Binding, sk: Pick<Skeleton, "bones">): { ids: string[]; strokes: Stroke[]; weights: Float32Array[] } | null {
+export function skinPreview(strokes: readonly Stroke[], binding: Binding, sk: Pick<Skeleton, "bones">): { ids: string[]; strokes: Stroke[]; idx: Uint8Array[]; weights: Float32Array[]; k: number } | null {
   const d = binding.mode === "skin" ? skinData(strokes, binding, sk) : null;
-  return d ? { ids: d.ids, strokes: d.strokes, weights: d.weights } : null;
+  return d ? { ids: d.ids, strokes: d.strokes, idx: d.idx, weights: d.weights, k: d.k } : null;
 }
 
 function mapPoints(s: Stroke, f: (x: number, y: number, i: number) => Vec): Stroke {
@@ -345,21 +376,29 @@ export function deformStrokes(strokes: readonly Stroke[], binding: Binding, sk: 
   if (!data) return strokes;
   const ms = data.ids.map((id) => mats.get(id)!);
   if (ms.every(isIdentity)) return strokes;
-  const k = ms.length;
+  const K = data.k;
   return data.strokes.map((s, si) => {
+    const ix = data.idx[si]!;
     const w = data.weights[si]!;
-    return mapPoints(s, (x, y, i) => {
+    const p = s.points;
+    const out = new Array<number>(p.length);
+    for (let i = 0; i < p.length; i += 3) {
+      const x = p[i]!;
+      const y = p[i + 1]!;
+      const base = (i / 3) * K;
       let X = 0;
       let Y = 0;
-      for (let j = 0; j < k; j++) {
-        const wj = w[i * k + j]!;
-        if (wj === 0) continue;
-        const m = ms[j]!;
+      for (let j = 0; j < K; j++) {
+        const m = ms[ix[base + j]!]!;
+        const wj = w[base + j]!;
         X += wj * (m.a * x + m.c * y + m.e);
         Y += wj * (m.b * x + m.d * y + m.f);
       }
-      return [X, Y];
-    });
+      out[i] = X;
+      out[i + 1] = Y;
+      out[i + 2] = p[i + 2]!;
+    }
+    return { ...s, points: out };
   });
 }
 

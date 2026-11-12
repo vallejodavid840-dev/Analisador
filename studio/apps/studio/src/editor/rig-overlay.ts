@@ -72,7 +72,7 @@ export function drawRigOverlay(ctx: CanvasRenderingContext2D, m: EditorModel, zo
       const drawn = m.showRest ? prev.strokes : frame.cells[m.layerId];
       const colors = prev.ids.map((id) => boneColor(sk.bones.findIndex((b) => b.id === id)));
       const rgb = colors.map((c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]);
-      const k = prev.ids.length;
+      const k = prev.k;
       const total = prev.strokes.reduce((n, s) => n + s.points.length / 3, 0);
       const step = Math.max(1, Math.ceil(total / 1800));
       let seen = 0;
@@ -80,12 +80,14 @@ export function drawRigOverlay(ctx: CanvasRenderingContext2D, m: EditorModel, zo
       prev.strokes.forEach((s, si) => {
         const pts = drawn?.[si]?.points ?? s.points;
         const w = prev.weights[si]!;
+        const ix = prev.idx[si]!;
         for (let i = 0; i < s.points.length / 3; i++, seen++) {
           if (seen % step) continue;
           let R = 0, G = 0, B = 0;
           for (let j = 0; j < k; j++) {
             const wj = w[i * k + j]!;
-            R += rgb[j]![0]! * wj; G += rgb[j]![1]! * wj; B += rgb[j]![2]! * wj;
+            const c = rgb[ix[i * k + j]!]!;
+            R += c[0]! * wj; G += c[1]! * wj; B += c[2]! * wj;
           }
           ctx.fillStyle = `rgb(${R | 0},${G | 0},${B | 0})`;
           ctx.beginPath();

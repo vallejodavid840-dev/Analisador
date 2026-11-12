@@ -209,6 +209,12 @@ export async function openEditor(root: HTMLElement, opts: EditorOptions): Promis
   const unsub = model.subscribe((c) => {
     if (c.doc || c.ui) {
       timeline.update(c);
+      // Durante la reproducción solo cambia el fotograma: los paneles (capas, esqueleto, pincel…) no necesitan
+      // reconstruirse 24 veces por segundo; se actualizan al pausar (que emite un cambio de UI).
+      if (model.playing && !c.doc) {
+        zoomPct.textContent = T.zoomPct(viewport.view.zoom);
+        return;
+      }
       layers.update();
       rigPanel.update();
       brush.update();

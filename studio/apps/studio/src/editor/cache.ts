@@ -32,6 +32,8 @@ export const layerScratch = pooled("layer");
 export const liveScratch = pooled("live");
 /** Lienzo del trazo en vivo (se reutiliza entre trazos). */
 export const liveInk = pooled("ink");
+/** Capas con pose (rig): se pintan en un lienzo reutilizable en vez de guardar un mapa de bits de 8 MB por pose. */
+export const rigScratch = pooled("rig");
 
 /** Resolución interna de los mapas de bits: la del proyecto, con tope de 2048 px en el lado largo. */
 export const cacheScaleFor = (doc: Pick<Animation, "width" | "height">) => Math.min(1, 2048 / Math.max(doc.width, doc.height));
@@ -65,6 +67,25 @@ export class LayerCache {
   /** Mapa de bits ya existente (sin crearlo ni alterar el orden de uso). */
   peek(strokes: readonly Stroke[]): HTMLCanvasElement | null {
     return this.map.get(strokes)?.canvas ?? null;
+  }
+
+  /**
+   * Para trazos DEFORMADOS por un rig (cada pose es un array nuevo y no se vuelve a usar): se pintan en un lienzo
+   * compartido sin pasar por la caché. El llamador debe dibujarlo ANTES de pedir otra capa.
+   */
+  renderTransient(strokes: readonly Stroke[], doc: Animation, maxScale = Infinity): HTMLCanvasElement | null {
+    if (strokes.length === 0) return null;
+    // A la resolución con la que se va a MOSTRAR (no más): con zoom de ajuste son ~2× menos píxeles que el documento.
+    const cs = Math.min(cacheScaleFor(doc), Math.max(0.2, maxScale));
+    const w = Math.ceil(doc.width * cs);
+    const h = Math.ceil(doc.height * cs);
+    const t = rigScratch(w, h);
+    t.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    t.ctx.globalCompositeOperation = "source-over";
+    t.ctx.globalAlpha = 1;
+    t.ctx.clearRect(0, 0, w, h);
+    drawStrokes(t.ctx, strokes, { pixelWidth: w, pixelHeight: h, scale: cs, scratch: opacityScratch });
+    return t.canvas as HTMLCanvasElement;
   }
 
   /** Mapa de bits de la capa (null si no tiene trazos). Lo crea si no está en caché. */
