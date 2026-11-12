@@ -3,6 +3,7 @@ import { svg } from "../dom";
 /** Iconos de trazo (24×24, `currentColor`). Propios, sin dependencias. */
 const PATHS = {
   pen: '<path d="M4 20l1-4L16.5 4.5a2 2 0 013 0l0 0a2 2 0 010 3L8 19z"/><path d="M14.5 6.5l3 3"/>',
+  fill: '<path d="M5 14l7-9 7 7-7 8z"/><path d="M19 17c1 1.6 1.5 2.6 1.5 3.4a1.5 1.5 0 01-3 0c0-.8.5-1.8 1.5-3.4z" fill="currentColor"/>',
   eraser: '<path d="M3 16.5L13 5.5l7 6.5-6 7H8z"/><path d="M8 19h12"/><path d="M8.5 9.5l7 6.5"/>',
   select: '<rect x="3.5" y="3.5" width="12" height="12" stroke-dasharray="2.5 2.5"/><path d="M12 12l8 3-3.5 1.5L15 20z" fill="currentColor"/>',
   hand: '<path d="M9 12V6.5a1.5 1.5 0 013 0V11"/><path d="M12 11V5a1.5 1.5 0 013 0v6"/><path d="M15 11V6.5a1.5 1.5 0 013 0V14c0 4-2.5 7-6.5 7S6 18 5 15l-1.2-3.2a1.5 1.5 0 012.6-1.3L9 13"/>',
@@ -38,6 +39,7 @@ const PATHS = {
   eyeBone: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><path d="M10 10l4 4"/>',
   export: '<path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M4 14v5a2 2 0 002 2h12a2 2 0 002-2v-5"/>',
   download: '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/>',
+  person: '<circle cx="12" cy="7" r="3.2"/><path d="M5 21c0-4.5 3-7.5 7-7.5s7 3 7 7.5"/>',
   film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
 } as const;
 

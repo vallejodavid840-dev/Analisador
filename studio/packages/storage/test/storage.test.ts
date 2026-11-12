@@ -253,4 +253,17 @@ describe("compatibilidad con animaciones anteriores (v1 → v3)", () => {
     await expect(store.saveAnimation(p.id, { ...a, rigs: [{ id: "s", name: "S", bones: [{ ...bad, parent: null, min: 5, max: -5 }], bindings: [] }] })).rejects.toMatchObject({ code: "invalid" });
     expect((await store.loadAnimation(p.id, eid)).rigs).toBeUndefined();
   });
+  it("un dibujo v2 con rig se abre igual, y el primer guardado conserva el original en .bak-v2", async () => {
+    const { p, eid } = await projectWithV1();
+    const a = await store.loadAnimation(p.id, eid);
+    const file = join(root, `${p.id}.gangstudio`, "episodes", `${eid}.json`);
+    await writeFile(file, JSON.stringify({ ...a, schemaVersion: 2, revision: 1 }));
+    const loaded = await store.loadAnimation(p.id, eid);
+    expect(loaded.schemaVersion).toBe(3);
+    expect(loaded.layers).toEqual(a.layers);
+    expect(await readFile(file, "utf8")).toContain('"schemaVersion":2'); // leer no modifica
+    await store.saveAnimation(p.id, { ...loaded, revision: 1 });
+    expect(JSON.parse(await readFile(`${file}.bak-v2`, "utf8")).schemaVersion).toBe(2);
+    expect(JSON.parse(await readFile(file, "utf8")).schemaVersion).toBe(3);
+  });
 });

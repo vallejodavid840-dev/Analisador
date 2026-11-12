@@ -96,7 +96,7 @@ export class ColorPanel {
   constructor(private readonly model: EditorModel) {
     const set = (c: string) => {
       model.updatePrefs((p) => (p.color = c.toLowerCase()));
-      if (model.prefs.tool !== "pen") model.setTool("pen"); // elegir un color implica querer pintar con él
+      if (model.prefs.tool !== "pen" && model.prefs.tool !== "fill") model.setTool("pen"); // elegir un color implica querer pintar con él
     };
     this.picker = h("input", { type: "color", class: "color-picker", "aria-label": T.colorTitle, "data-testid": "color-picker" });
     this.picker.addEventListener("input", () => set(this.picker.value));
@@ -132,7 +132,7 @@ export class ColorPanel {
     this.recent.replaceChildren(
       ...this.model.prefs.recent.map((r) => h("button", { type: "button", class: `swatch ${r === c ? "sel" : ""}`, style: `background:${r}`, "aria-label": `${T.recent} ${r}`, title: r, "data-color": r, onclick: () => {
         this.model.updatePrefs((p) => (p.color = r));
-        if (this.model.prefs.tool !== "pen") this.model.setTool("pen");
+        if (this.model.prefs.tool !== "pen" && this.model.prefs.tool !== "fill") this.model.setTool("pen");
       } })),
     );
   }

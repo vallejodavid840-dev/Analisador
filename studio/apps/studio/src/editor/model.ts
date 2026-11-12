@@ -4,7 +4,7 @@ import * as eng from "@gas/engine";
 import type { ResolvedPose, SkeletonState } from "@gas/engine";
 import { EngineError, History } from "@gas/engine";
 
-export type Tool = "pen" | "eraser" | "select" | "hand" | "rig";
+export type Tool = "pen" | "fill" | "eraser" | "select" | "hand" | "rig";
 
 export interface BrushSettings {
   size: number;
@@ -388,6 +388,32 @@ export class EditorModel {
     this.guard(() => this.commit(fn(this.doc), {}, true));
   }
 
+  /** Edición genérica del documento (herramientas de personaje): una sola entrada de historial; los errores se avisan. */
+  edit(fn: (d: Animation) => Animation, focus: { frameId?: string; layerId?: string } = {}): boolean {
+    let ok = false;
+    this.guard(() => {
+      this.commit(fn(this.doc), focus, true);
+      ok = true;
+    });
+    return ok;
+  }
+
+  /** Acabado de capa: opacidad, mezcla, recorte, desenfoque, parte. */
+  setLayerFx(layerId: string, p: eng.LayerFx): void {
+    this.rigDo((d) => eng.setLayerProps(d, layerId, p));
+  }
+
+  /** Capa nueva encima de `aboveId` (p. ej. de sombra o luz) y la deja activa. */
+  addLayerAbove(aboveId: string, name: string, fx: eng.LayerFx = {}): string | null {
+    let id: string | null = null;
+    this.guard(() => {
+      const r = eng.addLayer(this.doc, name, aboveId);
+      id = r.layerId;
+      this.commit(eng.setLayerProps(r.doc, r.layerId, fx), { layerId: r.layerId });
+    });
+    return id;
+  }
+
   setRigMode(mode: RigUi["mode"]): void {
     this.rig.mode = mode;
     this.rig.create = false;
@@ -611,7 +637,7 @@ export class EditorModel {
     this.emit({ ui: true });
   }
   selectAll(): void {
-    this.setSelection(this.currentStrokes().filter((s) => s.kind === "pen").map((s) => s.id));
+    this.setSelection(this.currentStrokes().filter((s) => s.kind !== "eraser").map((s) => s.id));
   }
   deleteSelection(): void {
     if (this.selection.size === 0) return;

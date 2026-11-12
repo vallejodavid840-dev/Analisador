@@ -280,3 +280,63 @@ body:has(.editor), body:has(.editor-loading) { overflow: hidden; overscroll-beha
   .side[data-open="rig"], .side[data-open="brush"], .side[data-open="color"], .side[data-open="layers"] { display: flex; flex-direction: column; }
   .side[data-open="rig"] .panel-section:not([data-section="rig"]) { display: none; }
 }
+
+/* ───────── Personajes (Fase 4) ───────── */
+.char-section { padding-top: 6px; }
+.char-section [data-testid="char-base-hint"] { margin: 2px 0 6px; }
+.cp-sec { border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; background: rgba(255, 255, 255, .02); }
+.cp-sec > summary { min-height: 44px; display: flex; align-items: center; padding: 0 12px; cursor: pointer; font: 800 13px/1 var(--font); letter-spacing: .1em; text-transform: uppercase; list-style: none; touch-action: manipulation; }
+.cp-sec > summary::-webkit-details-marker { display: none; }
+.cp-sec > summary::after { content: "▾"; margin-left: auto; color: var(--muted); }
+.cp-sec[open] > summary { border-bottom: 1px solid var(--line); color: var(--red); }
+.cp-sec[open] > summary::after { content: "▴"; }
+.cp-body { padding: 4px 12px 12px; }
+.cp-range input[type="range"] { width: 100%; height: 44px; accent-color: var(--red); background: transparent; touch-action: pan-y; }
+.cp-range > span { display: flex; justify-content: space-between; gap: 8px; }
+.cp-val { color: var(--cyan); font-weight: 800; }
+.cp-color-row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; }
+.cp-color input[type="color"] { width: 56px; height: 44px; padding: 2px; background: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+.cp-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.cp-swatches .swatch { width: 34px; height: 34px; }
+@media (pointer: coarse) { .cp-swatches .swatch { width: 44px; height: 44px; } }
+.cp-list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
+.cp-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; }
+.cp-list li > span { flex: 1 1 100%; font-weight: 700; word-break: break-word; }
+.cp-list li.col { display: grid; }
+.cp-list .btn.sm { flex: 1 1 auto; }
+.cp-check { min-height: 44px; }
+.cp-inst { margin: 8px 0; padding: 8px 10px; border: 1px solid var(--line); border-left: 3px solid var(--cyan); border-radius: 8px; }
+.cp-inst h4 { margin: 2px 0 6px; }
+.cp-hex { text-transform: lowercase; }
+.side [data-section="char"] { order: -3; }
+.side [data-section="chars"] { order: -3; }
+.side [data-section="fx"] { order: 7; }
+.stage[data-tool="fill"] .stage-canvas { cursor: crosshair; }
+@media (max-width: 899px), (max-height: 520px) {
+  .side[data-open="char"], .side[data-open="chars"], .side[data-open="fx"] { display: flex; flex-direction: column; }
+  .side[data-open="char"] .panel-section:not([data-section="char"]),
+  .side[data-open="chars"] .panel-section:not([data-section="chars"]),
+  .side[data-open="fx"] .panel-section:not([data-section="fx"]) { display: none; }
+  .side[data-open="char"] { max-height: 70dvh; }
+}
+
+/* ───────── Biblioteca (Fase 4) ───────── */
+.lib-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.lib-tools input[type="search"] { flex: 1 1 260px; min-height: 46px; padding: 8px 12px; font-size: 16px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+.lib-tools select { min-height: 46px; padding: 0 10px; font-size: 16px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+.char-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.char-card { display: grid; grid-template-columns: 96px 1fr; gap: 10px 12px; padding: 12px; background: var(--panel-2, #15151e); border: 1px solid var(--line); border-radius: 12px; }
+.char-thumb { width: 96px; height: 126px; object-fit: contain; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
+.char-thumb.empty { display: grid; place-items: center; background: #1a1a24; color: var(--muted); }
+.char-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.char-info strong { font: 800 18px/1.15 var(--font); word-break: break-word; }
+.char-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.char-actions .btn.sm { flex: 1 1 calc(33% - 6px); }
+.btn.danger { border-color: #8a1f2c; color: #ff8c95; }
+.chip-mini { display: inline-block; width: fit-content; padding: 2px 8px; font: 700 11px/1.4 var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--text); background: rgba(255, 255, 255, .08); border-radius: 99px; }
+.chip-mini.tag { background: rgba(53, 208, 255, .14); }
+.modal-body textarea { width: 100%; padding: 8px 10px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 16px; resize: vertical; }
+.modal-body input[type="text"], .modal-body select { width: 100%; min-height: 44px; padding: 8px 10px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 16px; }
+.char-mode .cell.keyed::after { display: none; }
+.view-bar { margin: 4px 0 6px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.view-bar .chip { min-width: 0; padding: 0 4px; font-size: 11px; letter-spacing: 0; }

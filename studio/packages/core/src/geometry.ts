@@ -97,6 +97,17 @@ function distToSegment(px: number, py: number, ax: number, ay: number, bx: numbe
 export function hitStroke(s: Stroke, x: number, y: number, tolerance = 0): boolean {
   const p = s.points;
   const r = s.size / 2 + tolerance;
+  if (s.kind === "fill") {
+    // dentro del contorno (par-impar) o a menos de `tolerance` de su borde
+    const n = p.length / 3;
+    let inside = false;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const xi = p[i * 3]!, yi = p[i * 3 + 1]!, xj = p[j * 3]!, yj = p[j * 3 + 1]!;
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+      if (!inside && distToSegment(x, y, xi, yi, xj, yj) <= tolerance) return true;
+    }
+    return inside;
+  }
   if (p.length === 3) return Math.hypot(x - p[0]!, y - p[1]!) <= r;
   for (let i = 0; i + 5 < p.length; i += 3) {
     if (distToSegment(x, y, p[i]!, p[i + 1]!, p[i + 3]!, p[i + 4]!) <= r) return true;

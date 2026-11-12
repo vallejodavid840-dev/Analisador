@@ -198,7 +198,7 @@ describe("guardado y recuperación del rig", () => {
     await ctx.close();
 
     const disk = await serverAnimation(env, ep.projectId, ep.episodeId);
-    expect(disk.schemaVersion).toBe(2);
+    expect(disk.schemaVersion).toBe(3);
     expect(disk.rigs).toHaveLength(1);
     expect(disk.rigs![0]!.bones).toHaveLength(2);
     expect(disk.rigs![0]!.bindings[0]).toMatchObject({ mode: "skin" });
@@ -251,14 +251,14 @@ describe("compatibilidad con proyectos anteriores (formato v1)", () => {
     const before = await projectJson(env, ep.projectId);
 
     const { ctx, page, errors } = await openEditorPage(env, ep.url);
-    expect(await page.evaluate(() => window.__gas!.model.doc.schemaVersion)).toBe(2);
+    expect(await page.evaluate(() => window.__gas!.model.doc.schemaVersion)).toBe(3);
     expect(await page.evaluate(() => window.__gas!.model.doc.frames.map((f) => f.hold))).toEqual([1, 2]);
     await page.evaluate(() => window.__gas!.viewport.setView({ zoom: 1, x: 120, y: 60 }));
     await settle(page);
     expect(isRed(await docPixel(page, 320, 180))).toBe(true); // el dibujo de siempre
     expect(await page.evaluate(() => window.__gas!.model.doc.rigs)).toBeUndefined();
     await page.getByTestId("tool-rig").click();
-    expect(await page.locator(".rig-section").textContent()).toContain("Sin esqueletos");
+    expect(await page.locator("[data-section=rig]").textContent()).toContain("Sin esqueletos");
     expect(await readFile(file, "utf8")).toBe(original); // abrir NO modifica el archivo
 
     // el rig funciona sobre un dibujo antiguo: se puede añadir un esqueleto y guardar
@@ -270,7 +270,7 @@ describe("compatibilidad con proyectos anteriores (formato v1)", () => {
     await page.mouse.move(600, 600);
     await waitSaved(page);
     const saved = JSON.parse(await readFile(file, "utf8"));
-    expect(saved.schemaVersion).toBe(2);
+    expect(saved.schemaVersion).toBe(3);
     expect(saved.rigs).toHaveLength(1);
     expect(saved.frames[0].cells["capa-b"][0].points).toEqual([100, 180, 1, 540, 180, 1]); // el dibujo intacto
     expect(await readFile(`${file}.bak-v1`, "utf8")).toBe(original); // el original conservado

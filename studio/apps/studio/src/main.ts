@@ -2,7 +2,9 @@ import { FPS_PRESETS, addEpisode, addSeason, type Project } from "@gas/core";
 import { api, type ApiError, type SummaryRow } from "./api";
 import { h } from "./dom";
 import { es } from "./es";
+import { characterApi } from "./api";
 import { openEditor } from "./editor/editor";
+import { showLibrary } from "./library";
 import "./editor/editor.css";
 import { logoMark } from "./logo";
 import "./styles.css";
@@ -128,7 +130,7 @@ async function showHome(note?: string): Promise<void> {
       h(
         "section",
         { class: "panel" },
-        h("h2", {}, es.projects),
+        h("div", { class: "season-head" }, h("h2", {}, es.projects), h("button", { class: "btn", type: "button", "data-testid": "open-library", onclick: () => go("#/personajes") }, "Biblioteca de personajes")),
         note ? h("p", { class: "msg" }, note) : null,
         loadError ? errorBox(loadError) : null,
         rows.length ? list : loadError ? null : h("p", { class: "empty" }, es.noProjects),
@@ -292,9 +294,33 @@ async function showEditor(projectId: string, episodeId: string): Promise<void> {
   }
 }
 
+async function showCharacterEditor(id: string): Promise<void> {
+  try {
+    const meta = await characterApi.meta(id);
+    current = null;
+    disposeEditor = await openEditor(root, {
+      projectId: "biblioteca",
+      projectName: "Biblioteca de personajes",
+      episodeId: id,
+      episodeTitle: meta.sheet.name,
+      character: { id, name: meta.sheet.name },
+      onExit: () => go("#/personajes"),
+    });
+  } catch (err) {
+    go("#/personajes");
+    void err;
+  }
+}
+
 async function route(): Promise<void> {
   disposeEditor?.();
   disposeEditor = null;
+  const lib = /^#\/personajes(?:\/([\w-]+))?$/.exec(location.hash);
+  if (lib) {
+    current = null;
+    if (lib[1]) return showCharacterEditor(lib[1]);
+    return showLibrary({ root, onBack: () => go(""), onOpen: (id) => go(`#/personajes/${id}`) });
+  }
   const m = /^#\/p\/([\w-]+)(?:\/e\/([\w-]+))?$/.exec(location.hash);
   if (!m) return showHome();
   if (m[2]) return showEditor(m[1]!, m[2]);

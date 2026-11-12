@@ -8,7 +8,7 @@ type Mode =
   | { kind: "none" }
   /** Tras un gesto de dos dedos: se ignoran los dedos restantes hasta que se levanten todos. */
   | { kind: "ignore" }
-  | { kind: "draw"; id: number; draft: Stroke; before: readonly Stroke[]; lastP: number }
+  | { kind: "draw"; id: number; draft: Stroke; before: readonly Stroke[]; lastP: number; fill: boolean }
   | { kind: "pan"; id: number; x: number; y: number }
   | { kind: "gesture"; midX: number; midY: number; dist: number }
   | { kind: "xform"; id: number; handle: HandleId | "move"; base: Stroke[]; bounds: Rect; start: [number, number] }
@@ -101,7 +101,7 @@ export class InputController {
       this.mode = { kind: "pan", id: e.pointerId, x: e.clientX, y: e.clientY };
       return;
     }
-    if (tool === "pen" || tool === "eraser") this.startStroke(e);
+    if (tool === "pen" || tool === "eraser" || tool === "fill") this.startStroke(e);
     else if (tool === "select") this.startSelect(e);
     else if (tool === "rig") {
       const w = this.vp.toWorld(e.clientX, e.clientY);
@@ -187,7 +187,7 @@ export class InputController {
 
   private updateCursor(e: PointerEvent): void {
     const tool = this.model.prefs.tool;
-    if ((tool !== "pen" && tool !== "eraser") || this.model.playing) {
+    if ((tool !== "pen" && tool !== "eraser" && tool !== "fill") || this.model.playing) {
       this.cursor.hidden = true;
       return;
     }
@@ -205,16 +205,18 @@ export class InputController {
     const b = this.model.brush;
     const pressure = e.pointerType === "pen" ? (e.pressure > 0 ? e.pressure : 0.5) : 1;
     const eraser = this.model.prefs.tool === "eraser";
+    const fill = this.model.prefs.tool === "fill";
+    // «Relleno»: mientras se dibuja el contorno se ve como una línea fina; al soltar se cierra y se rellena.
     const draft: Stroke = {
       id: shortId(),
       kind: eraser ? "eraser" : "pen",
       color: this.model.prefs.color,
-      size: b.size,
-      opacity: b.opacity,
-      sens: b.sens,
+      size: fill ? Math.max(1.5, 2 / this.vp.view.zoom) : b.size,
+      opacity: fill ? 0.9 : b.opacity,
+      sens: fill ? 0 : b.sens,
       points: [r1(x), r1(y), r2(pressure)],
     };
-    this.mode = { kind: "draw", id: e.pointerId, draft, before: this.model.currentStrokes(), lastP: pressure };
+    this.mode = { kind: "draw", id: e.pointerId, draft, before: this.model.currentStrokes(), lastP: pressure, fill };
     this.vp.beginLive(draft);
   }
 
@@ -235,6 +237,14 @@ export class InputController {
   }
 
   private finishStroke(m: Extract<Mode, { kind: "draw" }>): void {
+    if (m.fill) {
+      this.vp.cancelLive();
+      if (m.draft.points.length < 9) return; // un toque o dos puntos no forman una figura
+      const b = this.model.brush;
+      this.model.commitStroke({ id: m.draft.id, kind: "fill", color: this.model.prefs.color, size: 1, opacity: b.opacity, sens: 0, points: [...m.draft.points] });
+      this.model.rememberColor(this.model.prefs.color);
+      return;
+    }
     this.vp.liveFinish();
     const stroke: Stroke = { ...m.draft, points: [...m.draft.points] };
     const before = this.model.currentStrokes();
@@ -242,7 +252,7 @@ export class InputController {
     const after = this.model.currentStrokes();
     if (after !== before) this.vp.bakeLive(before, after);
     else this.vp.cancelLive();
-    if (stroke.kind === "pen") this.model.rememberColor(stroke.color);
+    if (stroke.kind !== "eraser") this.model.rememberColor(stroke.color);
   }
 
   /* ───────────── selección ───────────── */
@@ -265,7 +275,7 @@ export class InputController {
     let hit: Stroke | undefined;
     for (let i = strokes.length - 1; i >= 0; i--) {
       const s = strokes[i]!;
-      if (s.kind === "pen" && hitStroke(s, x, y, tol)) {
+      if (s.kind !== "eraser" && hitStroke(s, x, y, tol)) {
         hit = s;
         break;
       }
@@ -332,7 +342,7 @@ export class InputController {
     const moved = Math.hypot(e.clientX - m.startScreen[0], e.clientY - m.startScreen[1]);
     if (moved < 4) return; // un toque en vacío solo deselecciona
     const ids = new Set(m.additive ? this.model.selection : []);
-    for (const s of this.model.currentStrokes()) if (s.kind === "pen" && rectsIntersect(strokeBounds(s), rect)) ids.add(s.id);
+    for (const s of this.model.currentStrokes()) if (s.kind !== "eraser" && rectsIntersect(strokeBounds(s), rect)) ids.add(s.id);
     this.model.setSelection(ids);
   }
 }

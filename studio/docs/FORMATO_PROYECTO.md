@@ -76,3 +76,9 @@ Campos **opcionales** añadidos: `rigs[]` (esqueletos: `bones`, `bindings`) y `f
 - Migración v1→v2: sin cambios de datos (los campos nuevos son opcionales). Un episodio v1 se abre igual.
 - Al guardar por primera vez un archivo v1 ya migrado, se conserva una copia `<episodio>.json.bak-v1` (una sola vez) además de `.prev`.
 - Al borrar una capa se eliminan sus vínculos.
+
+## Fase 4: `schemaVersion 3` del dibujo (personajes)
+
+Todo opcional (un v2 es ya un v3 válido): capas con `opacity`, `blend`, `clip`, `blur`, `part`, `group`; trazos `kind: "fill"` (forma cerrada rellena); `character` (proporciones, vistas, expresiones, prendas, poses guardadas, parámetros `look`, referencias, paletas) e `instances` (personajes insertados en un episodio). `MAX_LAYERS` pasa de 64 a 128. La migración v2→v3 no cambia datos; el primer guardado conserva `.bak-v2`.
+
+Biblioteca (`<datos>/_personajes/<id>/`): `character.json` (ficha de 11 campos, carpeta, etiquetas, miniatura), `drawing.json`, `files/`. Detalle en `PERSONAJES.md`.

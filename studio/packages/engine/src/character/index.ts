@@ -7,3 +7,5 @@ export * from "./face";
 export * from "./hair";
 export * from "./garments";
 export * from "./ops";
+export * from "./accessories";
+export * from "./build";

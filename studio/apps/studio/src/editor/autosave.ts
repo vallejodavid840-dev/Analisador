@@ -1,5 +1,6 @@
-import { animationApi, type ApiError } from "../api";
-import { deleteDraft, draftKey, putDraft } from "./drafts";
+import type { ApiError } from "../api";
+import type { DocBackend } from "./backend";
+import { deleteDraft, putDraft } from "./drafts";
 import type { EditorModel } from "./model";
 
 export type SaveStatus = "saved" | "dirty" | "saving" | "offline" | "conflict" | "error";
@@ -27,7 +28,7 @@ export class AutoSave {
   onStatus: (s: SaveStatus, detail: string) => void = () => undefined;
 
   constructor(
-    private readonly projectId: string,
+    private readonly backend: DocBackend,
     private readonly model: EditorModel,
     baseRevision: number,
     private readonly isBusy: () => boolean,
@@ -35,7 +36,7 @@ export class AutoSave {
   ) {
     this.baseRevision = baseRevision;
     this.savedVersion = model.history.version;
-    this.key = draftKey(projectId, model.doc.episodeId);
+    this.key = backend.draftKey;
     this.unsub = model.subscribe((c) => {
       if (c.doc) this.changed();
     });
@@ -93,7 +94,7 @@ export class AutoSave {
     const version = this.model.history.version;
     const doc = { ...this.model.doc, revision: this.baseRevision };
     try {
-      const r = await animationApi.save(this.projectId, doc);
+      const r = await this.backend.save(doc);
       this.baseRevision = r.revision;
       this.savedVersion = version;
       this.retryMs = 3000;
@@ -133,7 +134,7 @@ export class AutoSave {
   /** Si el servidor ya tiene exactamente lo que intentábamos guardar, adopta su revisión y no hay conflicto. */
   private async serverHasSameContent(sent: { revision: number }, version: number): Promise<boolean> {
     try {
-      const server = await animationApi.load(this.projectId, this.model.doc.episodeId);
+      const server = await this.backend.load();
       const norm = (a: object) => JSON.stringify({ ...a, revision: 0 });
       if (norm(server) !== norm(sent)) return false;
       this.baseRevision = server.revision;
@@ -152,7 +153,7 @@ export class AutoSave {
     if (this.stopped || !this.dirty || this.status === "conflict") return;
     void this.writeDraft();
     if (this.isBusy() || this.model.history.inTransient) return;
-    if (final) animationApi.saveOnExit(this.projectId, { ...this.model.doc, revision: this.baseRevision });
+    if (final) this.backend.saveOnExit({ ...this.model.doc, revision: this.baseRevision });
     else void this.save();
   }
 

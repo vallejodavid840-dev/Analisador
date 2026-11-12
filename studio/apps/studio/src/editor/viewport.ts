@@ -6,6 +6,8 @@ import { handlesFor, ROTATE_OFFSET_PX } from "./handles";
 import type { EditorModel } from "./model";
 import { drawRigOverlay } from "./rig-overlay";
 
+export interface RefItem { id: string; view: string; img: HTMLImageElement; x: number; y: number; scale: number; opacity: number }
+
 export interface View {
   zoom: number;
   x: number;
@@ -265,6 +267,17 @@ export class Viewport {
       ctx.globalAlpha = 1;
     }
 
+    // Imágenes de referencia de la vista actual (por debajo del dibujo, solo en pantalla).
+    if (this.refs.length) {
+      const view = m.doc.character?.views.find((v) => v.frameId === m.frameId)?.kind;
+      for (const r of this.refs) {
+        if (r.view !== view) continue;
+        ctx.globalAlpha = r.opacity;
+        ctx.drawImage(r.img, r.x, r.y, r.img.naturalWidth * r.scale, r.img.naturalHeight * r.scale);
+      }
+      ctx.globalAlpha = 1;
+    }
+
     // Capas de abajo a arriba.
     const frame = m.renderedFrame();
     const raw = m.frame;
@@ -304,6 +317,13 @@ export class Viewport {
     ctx.restore();
 
     this.drawOverlay(ctx);
+  }
+
+  private refs: RefItem[] = [];
+  /** Imágenes de referencia (solo se ven al editar: nunca se exportan ni entran en la hoja). */
+  setReferences(items: RefItem[]): void {
+    this.refs = items;
+    this.requestRender();
   }
 
   private drawOverlay(ctx: CanvasRenderingContext2D): void {

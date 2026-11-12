@@ -1,4 +1,4 @@
-# Arquitectura (estado: Fase 3)
+# Arquitectura (estado: Fase 4)
 
 ```
 apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fastify)
@@ -20,6 +20,8 @@ apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fas
 - `packages/export`: exportación a MP4/WebM/PNG/ZIP (ver `docs/EXPORTACION.md`). `@gas/export/plan` es puro y también lo usa la interfaz.
 
 - Rigging (Fase 3): `core/src/rig.ts` (esquemas), `engine/src/rig.ts` y `rig-ops.ts` (matemática y operaciones puras). `posedFrame` se ejecuta antes de `composeFrame` en el editor y en la exportación. Ver `docs/RIGGING.md`.
+
+- Personajes (Fase 4): `engine/src/character/` (plan de cuerpo, rostro, pelo, ropa, accesorios, proporciones con retargeting, expresiones, inserción en episodios), `render/src/layer.ts` (opacidad, mezcla, recorte, desenfoque), `storage/src/characters.ts` y rutas `/api/characters` (biblioteca), `apps/studio` (`library.ts`, `ficha.ts`, `editor/char-panel.ts`, `fx-panel.ts`, `insert-panel.ts`). Ver `docs/PERSONAJES.md`.
 
 Paquetes previstos y aún **no creados**: `combat`, `audio` (ver plan por fases).
 

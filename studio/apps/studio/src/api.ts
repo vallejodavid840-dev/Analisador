@@ -95,3 +95,29 @@ export const exportApi = {
   list: (pid: string, eid: string) => exportRequest<{ files: ExportFileDTO[]; jobs: ExportJobDTO[] }>(`/api/projects/${P(pid)}/exports?episode=${P(eid)}`),
   fileUrl: (pid: string, name: string, inline = false) => `/api/projects/${P(pid)}/exports/files/${P(name)}${inline ? "?inline=1" : ""}`,
 };
+
+/* ───────────── Biblioteca de personajes (Fase 4) ───────────── */
+import type { CharacterMeta, CharacterSheet } from "@gas/core";
+
+const charUrl = (id: string) => `/api/characters/${encodeURIComponent(id)}`;
+
+export const characterApi = {
+  list: (q = "", folder = "") => request<{ characters: CharacterMeta[]; folders: string[] }>(`/api/characters?${new URLSearchParams({ ...(q ? { q } : {}), ...(folder ? { folder } : {}) })}`),
+  create: (name: string, folder?: string) => request<CharacterMeta>("/api/characters", json("POST", { name, ...(folder ? { folder } : {}) })),
+  meta: (id: string) => request<CharacterMeta>(charUrl(id)),
+  patch: (id: string, patch: { sheet?: CharacterSheet; folder?: string; tags?: string[]; thumbnail?: string | null }) => request<CharacterMeta>(charUrl(id), json("PATCH", patch)),
+  remove: (id: string) => request<unknown>(charUrl(id), { method: "DELETE" }),
+  duplicate: (id: string, name?: string) => request<CharacterMeta>(`${charUrl(id)}/duplicate`, json("POST", name ? { name } : {})),
+  drawing: (id: string) => request<Animation>(`${charUrl(id)}/drawing`),
+  saveDrawing: (a: Animation) => request<{ revision: number }>(`${charUrl(a.episodeId)}/drawing`, json("PUT", a)),
+  saveDrawingOnExit: (a: Animation): boolean => {
+    const body = JSON.stringify(a);
+    if (body.length > 60_000) return false;
+    void fetch(`${charUrl(a.episodeId)}/drawing`, { method: "PUT", headers: { "content-type": "application/json" }, body, keepalive: true }).catch(() => undefined);
+    return true;
+  },
+  files: (id: string) => request<{ files: string[] }>(`${charUrl(id)}/files`).then((r) => r.files),
+  fileUrl: (id: string, name: string) => `${charUrl(id)}/files/${encodeURIComponent(name)}`,
+  putFile: (id: string, name: string, blob: Blob) => request<unknown>(`${charUrl(id)}/files/${encodeURIComponent(name)}`, { method: "PUT", headers: { "content-type": blob.type || "image/png" }, body: blob }),
+  deleteFile: (id: string, name: string) => request<unknown>(`${charUrl(id)}/files/${encodeURIComponent(name)}`, { method: "DELETE" }),
+};

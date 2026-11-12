@@ -213,3 +213,11 @@ export async function setNum(page: Page, testid: string, value: number): Promise
 }
 
 export const skeletonOf = (page: Page) => page.evaluate(() => JSON.parse(JSON.stringify(window.__gas!.model.skeleton)));
+
+/** Crea un personaje en la biblioteca por API y devuelve su id y la URL del editor. */
+export async function createCharacter(env: Env, name: string, folder?: string) {
+  const res = await fetch(`${env.base}/api/characters`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name, ...(folder ? { folder } : {}) }) });
+  if (!res.ok) throw new Error(await res.text());
+  const m = (await res.json()) as { id: string };
+  return { id: m.id, url: `${env.base}/#/personajes/${m.id}` };
+}
