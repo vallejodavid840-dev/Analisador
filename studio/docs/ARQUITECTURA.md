@@ -1,4 +1,4 @@
-# Arquitectura (estado: Fase 2)
+# Arquitectura (estado: Fase 3)
 
 ```
 apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fastify)
@@ -18,6 +18,8 @@ apps/studio  (UI, Vite + TS, sin framework)  ──HTTP──>  apps/server (Fas
 - `apps/studio`: interfaz en español (`src/es.ts` concentra todos los textos), táctil (objetivos ≥48 px), sin dependencias de UI.
 
 - `packages/export`: exportación a MP4/WebM/PNG/ZIP (ver `docs/EXPORTACION.md`). `@gas/export/plan` es puro y también lo usa la interfaz.
+
+- Rigging (Fase 3): `core/src/rig.ts` (esquemas), `engine/src/rig.ts` y `rig-ops.ts` (matemática y operaciones puras). `posedFrame` se ejecuta antes de `composeFrame` en el editor y en la exportación. Ver `docs/RIGGING.md`.
 
 Paquetes previstos y aún **no creados**: `combat`, `audio` (ver plan por fases).
 

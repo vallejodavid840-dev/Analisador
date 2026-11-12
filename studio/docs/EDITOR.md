@@ -10,6 +10,7 @@ Se abre desde un episodio con **Dibujar**. La URL (`#/p/<proyecto>/e/<episodio>`
 | Borrador | E | Borra dentro de la capa activa (tamaño y opacidad propios) |
 | Seleccionar | V | Clic o recuadro; mover, escalar (esquinas = proporcional, bordes = un eje), rotar (Mayús = saltos de 15°), voltear, duplicar, eliminar |
 | Mover lienzo | H | Arrastrar para desplazar la vista |
+| Esqueleto | K | Huesos, vínculos y poses (ver `RIGGING.md`); panel «Huesos» en móvil |
 
 Zoom: rueda, pellizco, botones `−`/`+`, «100 %» y «Ajustar» (`0`). Desplazar: herramienta Mano, botón central, Alt+arrastrar o dos dedos.
 `[` y `]` cambian el tamaño; `O` activa el papel cebolla; `Intro`/`Espacio` reproducen; `←`/`→` cambian de fotograma; `Ctrl+Z` / `Ctrl+Mayús+Z` (o `Ctrl+Y`) deshacen y rehacen; `Supr` elimina la selección; `Esc` deselecciona.

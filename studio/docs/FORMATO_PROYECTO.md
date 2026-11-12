@@ -68,3 +68,11 @@ se guardan por dispositivo en `localStorage`.
   (si el servidor ya tiene exactamente lo mismo, p. ej. por el envío al cerrar la pestaña, adopta su revisión sin avisar).
 - Escritura atómica y copia `.prev` antes de sobrescribir. Un archivo dañado se informa y **no se modifica**.
 - **Borrador local** (IndexedDB) en cada cambio: si se cae la red o el navegador muere, el trabajo se recupera al volver.
+
+## Fase 3: `schemaVersion 2` del episodio (rigging)
+
+Campos **opcionales** añadidos: `rigs[]` (esqueletos: `bones`, `bindings`) y `frames[].poses` (`{[idEsqueleto]: {bones: {[idHueso]: {r, x?, y?}}, ease}}`). Detalle en `RIGGING.md`.
+
+- Migración v1→v2: sin cambios de datos (los campos nuevos son opcionales). Un episodio v1 se abre igual.
+- Al guardar por primera vez un archivo v1 ya migrado, se conserva una copia `<episodio>.json.bak-v1` (una sola vez) además de `.prev`.
+- Al borrar una capa se eliminan sus vínculos.

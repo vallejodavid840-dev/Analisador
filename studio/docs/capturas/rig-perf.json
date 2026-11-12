@@ -1,0 +1,31 @@
+{
+  "nota": "Navegador sin GPU (rasterizado por software), CPU sin limitar. «sostenido» = fotogramas mostrados / fotogramas que tocaba mostrar a 24 FPS.",
+  "escenario": {
+    "huesos": 40,
+    "trazos": 60,
+    "fotogramas": 48,
+    "resolucion": "1920×1080"
+  },
+  "realista": {
+    "puntosPorTrazo": 160,
+    "reproduccion24fps": {
+      "ticksReales": 44,
+      "ticksEsperados": 61,
+      "sostenido": 0.721
+    },
+    "mismaAnimacionSinRig_trazosHorneados": {
+      "sostenido": 0.531
+    },
+    "arrastreMsPorFotograma": 47.2,
+    "renderPoseMs": 32
+  },
+  "extremo_zigzag": {
+    "reproduccion24fps": {
+      "ticksReales": 36,
+      "ticksEsperados": 77,
+      "sostenido": 0.468
+    },
+    "arrastreMsPorFotograma": 117.8,
+    "renderPoseMs": 99.4
+  }
+}
