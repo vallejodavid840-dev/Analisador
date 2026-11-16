@@ -22,6 +22,9 @@ Cuando el usuario diga "Trabaja" / "Trabajar", ejecutar la rutina de abajo de fo
 - Crear la imagen con IA (si hay herramienta `creative_generate_image`, generarla directamente; si no, dar el prompt listo para pegar). La imagen debe ser llamativa, efecto "wow", pero REAL y creíble: que no parezca falsa ni dé miedo/desconfianza.
 - Entregar listo para copiar y pegar: precio de venta a poner en Facebook, título, descripción/copy completo, y todo lo necesario para publicar con confianza.
 
+- FORMATO OBLIGATORIO del paso 2: el usuario publica en **Facebook Marketplace** desde el celular. Entregar SIEMPRE los campos exactos del formulario, listos para pegar o elegir: Fotos (link de la foto real), Título, Precio, Categoría (elegir una opción de la lista de Marketplace: p.ej. Familia > Salud y belleza), Estado (Nuevo), Descripción (pegar), Ubicación (ciudad recomendada) y mensaje de respuesta automática. Sin explicaciones largas; solo "pega esto / elige esto".
+- No usar frases médicas ("cura", "baja la presión", "diagnostica") en ningún texto.
+
 ### Presupuesto de publicidad (dato del usuario)
 - Se invertirán unos ~$5 USD en publicidad por prueba. Considerar esto al calcular margen y recomendar: es una prueba pequeña, no una conclusión. Incluir en el paso 2 una recomendación de cómo gastar los $5 (objetivo mensajes, Ecuador, duración, público) y el punto de equilibrio.
 - Nota: la cuenta de imágenes Jj se quedó sin créditos (0). Si sigue así, dar solo el prompt.
