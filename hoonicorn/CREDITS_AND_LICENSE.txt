@@ -1,0 +1,19 @@
+HOONICORN — CREDIT / LICENSE INFORMATION
+
+Original model:
+- Title: Hoonicorn- A tribute to Ken Block (Updated)
+- Creator: Chaserfan
+- Source: https://sketchfab.com/3d-models/hoonicorn-a-tribute-to-ken-block-updated-e645466636304e5c86e91103608aed38
+- License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+- License text: https://creativecommons.org/licenses/by/4.0/
+
+This archive was repackaged by David with attribution metadata.
+Repackaging does not transfer or change the original model's authorship.
+If you publish or distribute an adapted version, provide appropriate credit,
+link to the source and license, and indicate any changes you actually made.
+
+---
+Changes made in this repository (hoonicorn/index.html and renders):
+- Wheels were pivoted at their centres so they can spin/steer (simple rig), car body roll/pitch added.
+- Race track, smoke, skid marks, cameras, HUD and audio were created from scratch.
+- The model file itself (hoonicorn.glb) is unmodified.
