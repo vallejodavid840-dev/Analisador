@@ -1,0 +1,18 @@
+<!doctype html><html><body style="margin:0"><script type="importmap">{"imports":{"three":"./lib/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three'; import {CAR_DEFS,loadCar} from './js/cars.js';
+const R=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});R.setSize(1280,720);document.body.appendChild(R.domElement);
+R.toneMapping=THREE.ACESFilmicToneMapping;R.outputColorSpace=THREE.SRGBColorSpace;
+const S=new THREE.Scene();S.background=new THREE.Color(0x9fb4c8);
+const c=document.createElement('canvas');c.width=256;c.height=128;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,128);gr.addColorStop(0,'#bcd');gr.addColorStop(.5,'#fff');gr.addColorStop(1,'#665');g.fillStyle=gr;g.fillRect(0,0,256,128);
+const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;
+const pm=new THREE.PMREMGenerator(R);S.environment=pm.fromEquirectangular(t).texture;
+const sun=new THREE.DirectionalLight(0xffffff,2.5);sun.position.set(-6,10,8);S.add(sun);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x555555}));floor.rotation.x=-Math.PI/2;S.add(floor);
+const info={};const cars=[];
+for(let i=0;i<CAR_DEFS.length;i++){let car;try{car=await loadCar(CAR_DEFS[i]);}catch(e){console.log('FAIL',CAR_DEFS[i].id,e.stack.split('\n').slice(0,4).join(' | '));continue;}car.root.position.set(-9+i*4.6,0,0);car.root.rotation.y=0.5;S.add(car.root);cars.push(car);
+  let tris=0;car.root.traverse(o=>{if(o.isMesh)tris+=(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3});
+  info[CAR_DEFS[i].id]={dims:car.dims,corners:car.corners.map(c=>[c.front?'F':'B',c.side,+c.r.toFixed(3),c.c.toArray().map(v=>+v.toFixed(2))]),tris};}
+const cam=new THREE.PerspectiveCamera(40,16/9,.1,300);cam.position.set(0,5,14);cam.lookAt(0,.8,0);
+R.render(S,cam);window.__info=info;window.__done=true;
+</script></body></html>
