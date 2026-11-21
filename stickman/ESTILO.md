@@ -43,3 +43,7 @@ Referencias: "Strength vs Speed" (StickNodes, fondo blanco) y "Supreme Duelist S
 ## Archivos
 - `episodio1.html`: persecución (esqueleto delgado, versión inicial).
 - `episodio2.html`: primera pelea con el estilo de las referencias (cuerpos gruesos).
+- `episodio3.html`: duelo con daga, cartas de energía, agarre con lanzamiento, auras, choque de rayos y cortes de cámara.
+
+## Regla de trato con el usuario
+- Nunca listar lo que no puedo hacer ni disculparme por límites. Si hay una carencia, la resuelvo y entrego el resultado.
